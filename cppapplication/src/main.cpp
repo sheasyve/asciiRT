@@ -18,8 +18,7 @@ const double specular_exponent = 256.0;
 //Lights
 std::vector<Vector3d> light_positions;
 std::vector<Vector4d> light_colors;
-//Ambient light
-const Vector4d ambient_light(0.2, 0.2, 0.2, 0);
+const Vector4d ambient_light(0.2, 0.2, 0.2, 0);//Ambient light
 
 bool ray_triangle_intersection(){}//Code to intersect a ray with a triangle, requires building aabb tree
 
@@ -72,6 +71,7 @@ void raytrace(int w, int h) {
     }
     print_scene_in_ascii(Color,A);
 }
+
 void setup_scene(){
     //TODO: Add objects to the scene and set up environment
 
@@ -79,6 +79,7 @@ void setup_scene(){
     light_positions.emplace_back(8, 8, 0);
     light_colors.emplace_back(16, 16, 16, 0);
 }
+
 int main() {
     int w= 200, h = 200;
     setup_scene();
