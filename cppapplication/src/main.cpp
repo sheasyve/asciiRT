@@ -21,6 +21,10 @@ std::vector<Vector4d> light_colors;
 //Ambient light
 const Vector4d ambient_light(0.2, 0.2, 0.2, 0);
 
+bool ray_triangle_intersection(){}//Code to intersect a ray with a triangle, requires building aabb tree
+
+bool ray_sphere_intersection(){}//Code to intersect a ray with a sphere
+
 //Code to intersect a ray with a box
 bool ray_box_intersection(const Vector3d& ray_origin, const Vector3d& ray_direction, const AlignedBox3d& box){
     Vector3d inv_raydir = 1 / ray_direction.array();
