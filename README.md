@@ -2,7 +2,7 @@
 #### For now, a basic c++ implementation has been started in the cppapplication folder.
 #### Installing this with docker should be somewhat simple for any operating system, so we dont need to use colab just yet.
 
-# Project Best Practices
+## Project Best Practices (rough guideline)
 
 ## Branching
 - **Main Branch (`main`)**:  
