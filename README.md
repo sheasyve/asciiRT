@@ -6,7 +6,8 @@
 
 ## Branching
 - **Main Branch (`main`)**:  
-  This branch should always work and contain code we know isn’t broken. Don’t commit directly to `main` to save your work unless it's a small, safe change.
+  For now the main branch contains starter code that does not work. Once we have a version 1.0,
+  this branch should always work and contain code we know isn’t broken. Don’t commit directly to `main` to save your work unless it's a small, safe change.
   
 - **Feature Branches**:  
   Create a new branch for any bigger changes or experiments. 
