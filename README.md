@@ -15,7 +15,7 @@
 ## Merging
 
 - **Merging into `main`**:  
-  Only merge changes that are tested (at least make sure it runs). Make sure your changes won’t break anything important. If you're not 100% sure, ask one of the others to take a quick look.
+  Once it is up and running at least, only merge changes that are tested (at least make sure it runs). Make sure your changes won’t break anything important. If you're not 100% sure, ask one of the others to take a quick look.
 
 ## Communication
 - **Avoid Overlap**:  
