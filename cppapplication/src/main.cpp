@@ -1,6 +1,6 @@
 #include "util.hpp"
 
-using namespace Eigen;
+using namespace Eigen;//Eigen library for linear algebra, matrix handling
 
 //Camera settings
 const double focal_length = 2;
