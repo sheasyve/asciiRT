@@ -1,5 +1,6 @@
 #include "util.hpp"
 #include "ray.hpp"
+#include "obj.hpp"
 #include "triangle.hpp"
 
 using namespace Eigen;//Eigen library for linear algebra, matrix handling
@@ -8,7 +9,7 @@ using namespace Eigen;//Eigen library for linear algebra, matrix handling
 const double focal_length = 2;
 const double field_of_view = 0.7854; //45 degrees
 const bool is_perspective = true;
-const Vector3d camera_position(0, 0, 2);
+const Vector3d camera_position(0, 0, -10);
 
 //Material settings
 const Vector4d reflection_color(0.7, 0.7, 0.7, 0);
@@ -37,16 +38,9 @@ bool ray_box_intersection(const Vector3d& ray_origin, const Vector3d& ray_direct
     return tmin < tmax;
 }
 
-// bool find_nearest_object(const Vector3d &ray_origin, const Vector3d &ray_direction, Vector3d &p, Vector3d &N){
-    // 
-// }
-
-Vector3d shoot_ray(const Ray ray, const Vector3d origin){
-    Vector3d p, N;
-    // const bool nearest_object = find_nearest_object(ray_origin, ray_direction, p, N);
-    
+std::optional<Triangle> find_nearest_object(const Ray ray){
     double min_t = 1000000;
-    Triangle* min_tri = NULL;
+    std::optional<Triangle> min_tri = {};
     for (auto tri : triangles) {
         auto res = tri.intersects(ray);
         if (res.has_value()) {
@@ -54,23 +48,41 @@ Vector3d shoot_ray(const Ray ray, const Vector3d origin){
             auto t = std::get<0>(tri_tup);
             if (t < min_t) {
                 min_t = t;
-                min_tri = &tri;
+                min_tri = tri;
             }
         }
     }
-    if (min_tri) {
-        return Vector3d(1.,1.,1.);
-    } else {
-        return Vector3d(0.,0.,0.);
+    return min_tri;
+}
+
+Vector3d shoot_ray(const Ray ray){
+    Vector3d color(0.,0.,0.);
+
+    const std::optional<Triangle> nearest_object_opt = find_nearest_object(ray);
+    
+    if (nearest_object_opt.has_value()) {
+        auto nearest = nearest_object_opt.value();
+        std::tuple<double, Vector3d> tup = nearest.intersects(ray).value();
+        
+        auto t = std::get<0>(tup);
+        auto p = std::get<1>(tup);
+        auto N = nearest.normal();
+
+        for (Vector3d l_pos : light_positions) {
+            Vector3d L = (l_pos - p).normalized();
+            float lambertian = std::max(N.dot(L), 0.0);
+            color += lambertian*Vector3d(1.,1.,1.);
+        }
     }
+    return color;
 }
 
 void print_scene_in_ascii(MatrixXd &Color, MatrixXd &A, int w, int h){
     // characters from https://stackoverflow.com/a/74186686
     const std::string brightness_chars = " `.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@";
     const int l = brightness_chars.size() - 1;
-    for (int j = 0; j < h; j++) {
-        for (int i = 0; i < w; i++) {
+    for (int j = h-1; j >= 0; j--) {
+        for (int i = w-1; i >= 0; i--) {
             char c = brightness_chars[(int)(l*Color(i,j))];
             std::cout << c;
         }
@@ -79,8 +91,6 @@ void print_scene_in_ascii(MatrixXd &Color, MatrixXd &A, int w, int h){
 }
 
 void raytrace(int w, int h) {
-    //Code to generate color values for each pixel
-    //TODO: Implement raytracing algorithm
     MatrixXd Color = MatrixXd::Zero(w, h);//Color of each pixel
     MatrixXd A = MatrixXd::Zero(w, h);  //Alpha value of each pixel
 
@@ -94,7 +104,7 @@ void raytrace(int w, int h) {
         for (unsigned j = 0; j < h; ++j){//Loop through every pixel
             const Vector3d pixel_center = image_origin + (i + 0.5) * x_displacement + (j + 0.5) * y_displacement;//Not sure if this pixel offset is right for ascii terminal out
             const Ray r(camera_position, (camera_position - pixel_center).normalized());
-            Vector3d result = shoot_ray(r, image_origin);
+            Vector3d result = shoot_ray(r);
             Color(i,j) = result(0,0);
         }
     }
@@ -103,16 +113,16 @@ void raytrace(int w, int h) {
 
 void setup_scene(){
     //TODO: Add objects to the scene and set up environment
-
+    Obj o(Matrix4d::Identity());
+    triangles = o.triangles;
     //Light sample
     light_positions.emplace_back(8, 8, 0);
     light_colors.emplace_back(16, 16, 16, 0);
 
-    triangles.push_back(Triangle(Vector3d(-20.,-20.,20), Vector3d(20.,-20.,20.), Vector3d(-20.,20.,20.)));
 }
 
 int main() {
-    int w= 20, h = 20;
+    int w= 200, h = 200;
     setup_scene();
     raytrace(w, h);
     
