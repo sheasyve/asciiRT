@@ -3,7 +3,6 @@
 
 #include "util.hpp"
 
-
 class Ray {
 public:
     Eigen::Vector3d origin, direction;

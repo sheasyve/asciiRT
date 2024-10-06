@@ -52,6 +52,4 @@ void vector_out(const std::vector<T> &v) {
     std::cout << '\n';
 }
 
-
-
 #endif  // UTIL_HPP

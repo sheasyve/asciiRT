@@ -1,7 +1,6 @@
 #ifndef TRIANGLE_HPP
 #define TRIANGLE_HPP
 
-
 #include "ray.hpp"
 #include "util.hpp"
 

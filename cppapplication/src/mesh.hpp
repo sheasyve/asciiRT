@@ -10,10 +10,7 @@
 class Mesh {
 public:
     std::vector<Triangle> triangles;
-
     Mesh(const std::vector<Triangle>& tris);
-
-    // Update this line to match the implementation
     std::optional<std::tuple<double, Eigen::Vector3d, const Triangle*>> intersects(const Ray& ray) const;
 };
 

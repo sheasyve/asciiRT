@@ -21,7 +21,7 @@ add_executable(${PROJECT_NAME}
     src/triangle.cpp 
     src/mesh.cpp        # Add this line to include mesh.cpp
     src/sphere.cpp      # Add this line to include sphere.cpp
+    src/intersect_visitor.cpp
 )
 
-# Link Eigen3
 target_link_libraries(${PROJECT_NAME} Eigen3::Eigen)

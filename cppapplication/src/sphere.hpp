@@ -2,7 +2,6 @@
 #define SPHERE_HPP
 
 #include "util.hpp"
-
 #include "ray.hpp"
 
 class Sphere {

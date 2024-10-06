@@ -9,7 +9,6 @@ std::optional<std::tuple<double, Eigen::Vector3d>> Sphere::intersects(const Ray&
     double b = 2.0 * oc.dot(ray.direction);
     double c = oc.dot(oc) - radius * radius;
     double discriminant = b * b - 4 * a * c;
-
     if (discriminant < 0) {
         return std::nullopt;
     } else {
