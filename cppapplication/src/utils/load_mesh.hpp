@@ -1,18 +1,17 @@
 // obj.hpp
-#ifndef OBJ_HPP
-#define OBJ_HPP
+#ifndef LOAD_MESH_HPP
+#define LOAD_MESH_HPP
 
 #include "../shapes/triangle.hpp"
 #include "../shapes/sphere.hpp"
 #include "../shapes/mesh.hpp"
 #include "util.hpp"
 
-class Obj {
+class LoadMesh {
 public:
     std::vector<std::variant<Triangle, Sphere, Mesh>> objects;
-    Obj(const Eigen::Matrix4d& transform);
-    void add_sphere(const Eigen::Vector3d& center, double radius);
+    LoadMesh (const Eigen::Matrix4d& transform);
     Mesh get_mesh() const;
 };
 
-#endif
+#endif // LOAD_MESH_HPP

@@ -3,7 +3,7 @@
 
 #include "util.hpp"
 #include "ray.hpp"
-#include "obj.hpp"
+#include "load_mesh.hpp"
 #include "intersect.hpp"
 #include "../shapes/triangle.hpp"
 #include "../shapes/sphere.hpp"

@@ -109,8 +109,8 @@ void raytrace(int w, int h){
 }
 
 void setup_scene(){
-    Obj o(Eigen::Matrix4d::Identity()); //Mesh
-    Mesh mesh = o.get_mesh();           
+    LoadMesh m(Eigen::Matrix4d::Identity()); //Mesh
+    Mesh mesh = m.get_mesh();           
     if (!mesh.triangles.empty()) objects.emplace_back(mesh);// Add mesh to objects
     //Sphere example
     //Eigen::Vector3d sphere_center(0, 0, 1);               
@@ -119,9 +119,7 @@ void setup_scene(){
     light_colors.emplace_back(16, 16, 16, 0);  // Light intensity
     light_positions.emplace_back(0, 0, 0);  // Light position
     light_colors.emplace_back(16, 16, 16, 0);  // Light intensity
-
 }
-
 
 int main(){
     int w = 181, h = 101;

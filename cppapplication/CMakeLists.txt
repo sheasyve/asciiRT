@@ -17,7 +17,7 @@ include_directories("/usr/include/eigen3")
 add_executable(${PROJECT_NAME} 
     src/main.cpp 
     src/utils/ray.cpp 
-    src/utils/obj.cpp 
+    src/utils/load_mesh.cpp 
     src/shapes/triangle.cpp 
     src/shapes/mesh.cpp        # Add this line to include mesh.cpp
     src/shapes/sphere.cpp      # Add this line to include sphere.cpp
