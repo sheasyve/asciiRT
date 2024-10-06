@@ -1,7 +1,7 @@
 #include "utils/main_util.hpp"
 
 // Camera settings
-const double focal_length = 2;
+const double focal_length = 2.16;
 const double field_of_view = 0.7854; // 45 degrees
 const Eigen::Vector3d camera_position(0, 0, -10);
 
@@ -52,7 +52,6 @@ std::optional<std::tuple<double, Eigen::Vector3d, Intersectable, const Triangle 
     return nearest_hit;
 }
 
-
 Eigen::Vector3d shoot_ray(const Ray &ray){
     Eigen::Vector3d color(0., 0., 0.);
     auto nearest_hit = find_nearest_object(ray);
@@ -67,6 +66,22 @@ Eigen::Vector3d shoot_ray(const Ray &ray){
         }
     }
     return color;
+}
+
+void print_scene_in_ascii(const Eigen::MatrixXd &Color, int w, int h) {
+    // ASCII characters for brightness levels
+    const std::string brightness_chars = " `.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@";
+    const int l = brightness_chars.size() - 1;
+    auto [first_line, last_line] = find_boundary(Color, w, h);
+    for (int j = first_line; j >= last_line; --j) {
+        for (int i = 0; i < w; ++i) {
+            double brightness = Color(i, j);
+            brightness = std::max(0.0, std::min(1.0, brightness)); // Clamp brightness between 0 and 1
+            char c = brightness_chars[static_cast<int>(l * brightness)];
+            std::cout << c;
+        }
+        std::cout << std::endl;
+    }
 }
 
 void raytrace(int w, int h){
@@ -102,26 +117,14 @@ void setup_scene(){
     //objects.emplace_back(Sphere(sphere_center, 1.));            
     light_positions.emplace_back(8, 8, 0);  // Light position
     light_colors.emplace_back(16, 16, 16, 0);  // Light intensity
+    light_positions.emplace_back(0, 0, 0);  // Light position
+    light_colors.emplace_back(16, 16, 16, 0);  // Light intensity
+
 }
 
-void print_scene_in_ascii(const Eigen::MatrixXd &Color, int w, int h) {
-    // ASCII characters for brightness levels
-    const std::string brightness_chars = " `.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@";
-    const int l = brightness_chars.size() - 1;
-    auto [first_line, last_line] = find_boundary(Color, w, h);
-    for (int j = first_line; j >= last_line; --j) {
-        for (int i = 0; i < w; ++i) {
-            double brightness = Color(i, j);
-            brightness = std::max(0.0, std::min(1.0, brightness)); // Clamp brightness between 0 and 1
-            char c = brightness_chars[static_cast<int>(l * brightness)];
-            std::cout << c;
-        }
-        std::cout << std::endl;
-    }
-}
 
 int main(){
-    int w = 202, h = 113;
+    int w = 181, h = 101;
     setup_scene();
     raytrace(w, h);
     return 0;
