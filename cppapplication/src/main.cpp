@@ -69,33 +69,6 @@ Eigen::Vector3d shoot_ray(const Ray &ray){
     return color;
 }
 
-void print_scene_in_ascii(const Eigen::MatrixXd &Color, int w, int h) {
-    // ASCII characters for brightness levels
-    const std::string brightness_chars = " `.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@";
-    const int l = brightness_chars.size() - 1;
-    auto [first_line, last_line] = find_boundary(Color, w, h);
-    for (int j = first_line; j >= last_line; --j) {
-        for (int i = 0; i < w; ++i) {
-            double brightness = Color(i, j);
-            brightness = std::max(0.0, std::min(1.0, brightness)); // Clamp brightness between 0 and 1
-            char c = brightness_chars[static_cast<int>(l * brightness)];
-            std::cout << c;
-        }
-        std::cout << std::endl;
-    }
-}
-
-void setup_scene(){
-    Obj o(Eigen::Matrix4d::Identity()); //Mesh
-    Mesh mesh = o.get_mesh();           
-    if (!mesh.triangles.empty()) objects.emplace_back(mesh);// Add mesh to objects
-    //Sphere example
-    //Eigen::Vector3d sphere_center(0, 0, 1);               
-    //objects.emplace_back(Sphere(sphere_center, 1.));            
-    light_positions.emplace_back(8, 8, 0);  // Light position
-    light_colors.emplace_back(16, 16, 16, 0);  // Light intensity
-}
-
 void raytrace(int w, int h){
     Eigen::MatrixXd Color = Eigen::MatrixXd::Zero(w, h); 
     const double aspect_ratio = double(w) / double(h);
@@ -118,6 +91,33 @@ void raytrace(int w, int h){
         }
     }
     print_scene_in_ascii(Color, w, h);
+}
+
+void setup_scene(){
+    Obj o(Eigen::Matrix4d::Identity()); //Mesh
+    Mesh mesh = o.get_mesh();           
+    if (!mesh.triangles.empty()) objects.emplace_back(mesh);// Add mesh to objects
+    //Sphere example
+    //Eigen::Vector3d sphere_center(0, 0, 1);               
+    //objects.emplace_back(Sphere(sphere_center, 1.));            
+    light_positions.emplace_back(8, 8, 0);  // Light position
+    light_colors.emplace_back(16, 16, 16, 0);  // Light intensity
+}
+
+void print_scene_in_ascii(const Eigen::MatrixXd &Color, int w, int h) {
+    // ASCII characters for brightness levels
+    const std::string brightness_chars = " `.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@";
+    const int l = brightness_chars.size() - 1;
+    auto [first_line, last_line] = find_boundary(Color, w, h);
+    for (int j = first_line; j >= last_line; --j) {
+        for (int i = 0; i < w; ++i) {
+            double brightness = Color(i, j);
+            brightness = std::max(0.0, std::min(1.0, brightness)); // Clamp brightness between 0 and 1
+            char c = brightness_chars[static_cast<int>(l * brightness)];
+            std::cout << c;
+        }
+        std::cout << std::endl;
+    }
 }
 
 int main(){
