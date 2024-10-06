@@ -20,22 +20,22 @@ using Intersectable = std::variant<Triangle, Sphere, Mesh>;
 std::vector<Intersectable> objects;
 
 Eigen::Vector3d compute_normal(const std::variant<Triangle, Sphere, Mesh> &obj, const Eigen::Vector3d &hit_point, const Triangle *hit_triangle = nullptr){
-    //Find normal based on the given object
     return std::visit([&](const auto &shape) -> Eigen::Vector3d{
-        if constexpr (std::is_same_v<decltype(shape), const Sphere&>) {//Sphere 
+        if constexpr (std::is_same_v<decltype(shape), const Sphere&>) {//Sphere
             return (hit_point - shape.center).normalized();
-        } else if constexpr (std::is_same_v<decltype(shape), const Triangle&>) {//Single Triangle
+        } else if constexpr (std::is_same_v<decltype(shape), const Triangle&>) {//Triangle
             return shape.normal();
         } else if constexpr (std::is_same_v<decltype(shape), const Mesh&>) {//Mesh
             if (hit_triangle != nullptr) {
                 return hit_triangle->normal();  
             }
-            return Eigen::Vector3d(0, 0, 0); 
-        } }, obj);
+            return Eigen::Vector3d(0, 0, 0);  // No valid hit triangle, fallback
+        }
+    }, obj);
 }
 
 std::optional<std::tuple<double, Eigen::Vector3d, Intersectable, const Triangle *>> find_nearest_object(const Ray &ray){
-    //Find the nearest intersecting sphere
+    //Find the nearest intersecting mesh or sphere
     std::optional<std::tuple<double, Eigen::Vector3d, Intersectable, const Triangle *>> nearest_hit;
     double min_t = INFINITY;
     for (const auto &object : objects){
@@ -45,11 +45,12 @@ std::optional<std::tuple<double, Eigen::Vector3d, Intersectable, const Triangle 
             if (t < min_t){
                 min_t = t;
                 const Triangle *hit_triangle = nullptr;
-                if (std::holds_alternative<Mesh>(object)){
+                if (std::holds_alternative<Mesh>(object)){//Mesh
                     const Mesh &mesh = std::get<Mesh>(object);
                     auto mesh_hit = mesh.intersects(ray);
-                    if (mesh_hit.has_value())hit_triangle = std::get<2>(mesh_hit.value());// Get the hit triangle
+                    if (mesh_hit.has_value()) hit_triangle = std::get<2>(mesh_hit.value()); // Get the hit triangle
                 }
+                // For Sphere, hit_triangle remains nullptr.
                 nearest_hit = std::make_tuple(t, std::get<1>(hit.value()), object, hit_triangle);
             }
         }
@@ -57,13 +58,15 @@ std::optional<std::tuple<double, Eigen::Vector3d, Intersectable, const Triangle 
     return nearest_hit;
 }
 
+
 Eigen::Vector3d shoot_ray(const Ray &ray){
     Eigen::Vector3d color(0., 0., 0.);
     auto nearest_hit = find_nearest_object(ray);
     if (nearest_hit.has_value()){
-        const auto &[t, hit_point, nearest_object, hit_triangle] = nearest_hit.value(); // Unpack the tuple
-        Eigen::Vector3d normal = compute_normal(nearest_object, hit_point, hit_triangle); 
-        for (const Eigen::Vector3d &light_pos : light_positions){// Perform lighting calculations
+        const auto &[t, hit_point, nearest_object, hit_triangle] = nearest_hit.value();
+        Eigen::Vector3d normal = compute_normal(nearest_object, hit_point, hit_triangle);
+        // Lighting calculations
+        for (const Eigen::Vector3d &light_pos : light_positions){
             Eigen::Vector3d L = (light_pos - hit_point).normalized();
             double lambertian = std::max(normal.dot(L), 0.0);
             color += lambertian * Eigen::Vector3d(1., 1., 1.);
@@ -89,12 +92,18 @@ void print_scene_in_ascii(const Eigen::MatrixXd &Color, int w, int h) {
 }
 
 void setup_scene(){
-    // Scene setup and ray tracing loop
+    //Mesh
     Obj o(Eigen::Matrix4d::Identity()); 
     Mesh mesh = o.get_mesh();           
-    if (!mesh.triangles.empty()) objects.emplace_back(mesh); // Add mesh to objects
-    light_positions.emplace_back(8, 8, 0);// Add lights to the scene
-    light_colors.emplace_back(16, 16, 16, 0);
+    if (!mesh.triangles.empty()) {
+        objects.emplace_back(mesh); // Add mesh to objects
+    }
+    //Sphere
+    //Eigen::Vector3d sphere_center(0, 0, 1);               
+    //objects.emplace_back(Sphere(sphere_center, 1.));            
+    // Add lights to the scene
+    light_positions.emplace_back(8, 8, 0);  // Light position
+    light_colors.emplace_back(16, 16, 16, 0);  // Light intensity
 }
 
 void raytrace(int w, int h){
