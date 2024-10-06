@@ -1,19 +1,20 @@
 #ifndef MESH_HPP
 #define MESH_HPP
 
-#include "util.hpp"
-#include "intersectable.hpp"
+#include <vector>
+#include <optional>
+#include <tuple>
 #include "triangle.hpp"
+#include "ray.hpp"
 
-class Obj; //Forward Declaration
-
-class Mesh : public Intersectable {
+class Mesh {
 public:
-    std::vector<std::shared_ptr<Triangle>> triangles;
-    Mesh(const std::vector<std::shared_ptr<Triangle>>& tris);
-    std::optional<std::tuple<double, Eigen::Vector3d>> intersects(const Ray& ray) const override;
-};
+    std::vector<Triangle> triangles;
 
-std::shared_ptr<Mesh> get_mesh(const Obj& obj);
+    Mesh(const std::vector<Triangle>& tris);
+
+    // Update this line to match the implementation
+    std::optional<std::tuple<double, Eigen::Vector3d, const Triangle*>> intersects(const Ray& ray) const;
+};
 
 #endif

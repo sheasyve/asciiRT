@@ -24,6 +24,7 @@
 #include <optional>
 #include <memory>
 #include <Eigen/Dense>
+#include <variant>
 
 #define _USE_MATH_DEFINES
 #define ll long long
