@@ -1,14 +1,12 @@
 #ifndef RAY_HPP
 #define RAY_HPP
 
-#include "util.hpp"
-
-using namespace Eigen;
+#include <Eigen/Dense>
 
 class Ray {
 public:
-    Vector3d origin, direction;
-    Ray(Vector3d origin, Vector3d direction);
+    Eigen::Vector3d origin, direction;
+    Ray(const Eigen::Vector3d& origin, const Eigen::Vector3d& direction);
 };
 
-#endif
+#endif  // RAY_HPP
