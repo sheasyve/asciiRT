@@ -117,25 +117,37 @@ void print_scene_in_ascii(MatrixXd &Color, MatrixXd &A, int w, int h){
 }
 
 void raytrace(int w, int h) {
-    MatrixXd Color = MatrixXd::Zero(w, h);//Color of each pixel
-    MatrixXd A = MatrixXd::Zero(w, h);  //Alpha value of each pixel
+    MatrixXd Color = MatrixXd::Zero(w, h); // Color of each pixel
+    MatrixXd A = MatrixXd::Zero(w, h);     // Alpha value of each pixel
 
     const double aspect_ratio = double(w) / double(h);
-    const double y = (((focal_length)*sin(field_of_view / 2)) / sin((180 - (90 + ((field_of_view * (180 / M_PI) / 2)))) * (M_PI / 180)));
+    const double y = (((focal_length) * sin(field_of_view / 2)) / 
+                      sin((180 - (90 + ((field_of_view * (180 / M_PI) / 2)))) * (M_PI / 180)));
     const double x = (y * aspect_ratio);
     const Vector3d image_origin(-x, y, camera_position[2] - focal_length);
     const Vector3d x_displacement(2.0 / w * x, 0, 0);
     const Vector3d y_displacement(0, -2.0 / h * y, 0);
-    for (unsigned i = 0; i < w; ++i){
-        for (unsigned j = 0; j < h; ++j){//Loop through every pixel
-            const Vector3d pixel_center = image_origin + (i + 0.5) * x_displacement + (j + 0.5) * y_displacement;
+
+    for (unsigned i = 0; i < w; ++i) {
+        for (unsigned j = 0; j < h; ++j) { // Loop through every pixel
+            const Vector3d pixel_center = image_origin + 
+                                           (i + 0.5) * x_displacement + 
+                                           (j + 0.5) * y_displacement;
             const Ray r(camera_position, (camera_position - pixel_center).normalized());
             Vector3d result = shoot_ray(r);
-            Color(i,j) = result(0,0);
+            
+            // Ensure result is within bounds before assigning it to Color
+            if (result.size() > 0) {
+                Color(i, j) = result(0); // Assuming result is a Vector3d
+            } else {
+                std::cerr << "Invalid ray result." << std::endl;
+            }
         }
     }
+
     print_scene_in_ascii(Color, A, w, h);
 }
+
 //THis is what i have
 
 void setup_scene()
