@@ -21,7 +21,10 @@
 #include <cassert>
 #include <iterator>
 #include <fstream>
+#include <optional>
+#include <memory>
 #include <Eigen/Dense>
+#include <variant>
 
 #define _USE_MATH_DEFINES
 #define ll long long
@@ -29,6 +32,10 @@
 #define pb push_back
 #define all(x) (x).begin(), (x).end()
 #define rall(v) v.rbegin(), v.rend()
+
+const double EPS = 0.00001;;
+
+using namespace Eigen;//Eigen library for linear algebra, matrix handling
 
 template <typename T>
 std::vector<T> vector_in(int n) {
