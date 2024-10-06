@@ -3,7 +3,7 @@
 // Camera settings
 const double focal_length = 2.16;
 const double field_of_view = 0.7854; // 45 degrees
-const Eigen::Vector3d camera_position(0, 0, -10);
+const Eigen::Vector3d camera_position(0, 0, -25);
 
 // Lights
 std::vector<Eigen::Vector3d> light_positions;
