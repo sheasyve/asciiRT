@@ -1,5 +1,4 @@
 #include "triangle.hpp"
-#include "util.hpp"
 
 Triangle::Triangle(Eigen::Vector3d p1, Eigen::Vector3d p2, Eigen::Vector3d p3)
     : p1(p1), p2(p2), p3(p3) {}

@@ -2,6 +2,12 @@
 #define PRINT_UTIL_HPP
 
 #include "util.hpp"
+#include "ray.hpp"
+#include "obj.hpp"
+#include "intersect.hpp"
+#include "../shapes/triangle.hpp"
+#include "../shapes/sphere.hpp"
+#include "../shapes/mesh.hpp"
 
 std::pair<int, int> find_boundary(const Eigen::MatrixXd &Color, int w, int h) {
     int first_line = -1,last_line = -1;

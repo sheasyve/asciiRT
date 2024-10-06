@@ -2,9 +2,9 @@
 #ifndef OBJ_HPP
 #define OBJ_HPP
 
-#include "triangle.hpp"
-#include "sphere.hpp"
-#include "mesh.hpp"
+#include "../shapes/triangle.hpp"
+#include "../shapes/sphere.hpp"
+#include "../shapes/mesh.hpp"
 #include "util.hpp"
 
 class Obj {

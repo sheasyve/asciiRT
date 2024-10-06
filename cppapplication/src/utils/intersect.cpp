@@ -1,16 +1,18 @@
-#include "intersect_visitor.hpp"
+#include "intersect.hpp"
 
-IntersectVisitor::IntersectVisitor(const Ray& ray) : ray(ray) {}
+//This class returns the intersection based on shape type
 
-std::optional<std::tuple<double, Eigen::Vector3d>> IntersectVisitor::operator()(const Triangle& triangle) const {
+Intersect::Intersect(const Ray& ray) : ray(ray) {}
+
+std::optional<std::tuple<double, Eigen::Vector3d>> Intersect::operator()(const Triangle& triangle) const {
     return triangle.intersects(ray);
 }
 
-std::optional<std::tuple<double, Eigen::Vector3d>> IntersectVisitor::operator()(const Sphere& sphere) const {
+std::optional<std::tuple<double, Eigen::Vector3d>> Intersect::operator()(const Sphere& sphere) const {
     return sphere.intersects(ray);
 }
 
-std::optional<std::tuple<double, Eigen::Vector3d>> IntersectVisitor::operator()(const Mesh& mesh) const {
+std::optional<std::tuple<double, Eigen::Vector3d>> Intersect::operator()(const Mesh& mesh) const {
     std::optional<std::tuple<double, Eigen::Vector3d>> nearest_hit;
     double min_t = std::numeric_limits<double>::infinity();
     for (const auto& triangle : mesh.triangles) {

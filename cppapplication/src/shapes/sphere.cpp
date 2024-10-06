@@ -1,5 +1,4 @@
 #include "sphere.hpp"
-#include "util.hpp"
 
 Sphere::Sphere(const Eigen::Vector3d& center, double radius) : center(center), radius(radius) {}
 

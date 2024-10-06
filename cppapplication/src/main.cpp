@@ -1,10 +1,4 @@
-#include "print_util.hpp"
-#include "ray.hpp"
-#include "obj.hpp"
-#include "triangle.hpp"
-#include "sphere.hpp"
-#include "mesh.hpp"
-#include "intersect_visitor.hpp"
+#include "utils/main_util.hpp"
 
 // Camera settings
 const double focal_length = 2;
@@ -39,7 +33,7 @@ std::optional<std::tuple<double, Eigen::Vector3d, Intersectable, const Triangle 
     std::optional<std::tuple<double, Eigen::Vector3d, Intersectable, const Triangle *>> nearest_hit;
     double min_t = INFINITY;
     for (const auto &object : objects){
-        auto hit = std::visit(IntersectVisitor(ray), object);
+        auto hit = std::visit(Intersect(ray), object);//Find intersection based on this object type
         if (hit.has_value()){
             double t = std::get<0>(hit.value());
             if (t < min_t){
@@ -92,16 +86,12 @@ void print_scene_in_ascii(const Eigen::MatrixXd &Color, int w, int h) {
 }
 
 void setup_scene(){
-    //Mesh
-    Obj o(Eigen::Matrix4d::Identity()); 
+    Obj o(Eigen::Matrix4d::Identity()); //Mesh
     Mesh mesh = o.get_mesh();           
-    if (!mesh.triangles.empty()) {
-        objects.emplace_back(mesh); // Add mesh to objects
-    }
-    //Sphere
+    if (!mesh.triangles.empty()) objects.emplace_back(mesh);// Add mesh to objects
+    //Sphere example
     //Eigen::Vector3d sphere_center(0, 0, 1);               
     //objects.emplace_back(Sphere(sphere_center, 1.));            
-    // Add lights to the scene
     light_positions.emplace_back(8, 8, 0);  // Light position
     light_colors.emplace_back(16, 16, 16, 0);  // Light intensity
 }
@@ -131,7 +121,7 @@ void raytrace(int w, int h){
 }
 
 int main(){
-    int w = 200, h = 100;
+    int w = 202, h = 113;
     setup_scene();
     raytrace(w, h);
     return 0;

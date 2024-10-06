@@ -1,11 +1,5 @@
 // obj.cpp
 #include "obj.hpp"
-#include "triangle.hpp"
-#include "sphere.hpp"
-#include "mesh.hpp"
-#include <iostream>
-#include <sstream>
-#include <Eigen/Dense>
 
 Obj::Obj(const Eigen::Matrix4d& transform) {
     std::vector<Eigen::Vector4d> points;
