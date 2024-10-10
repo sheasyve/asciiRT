@@ -1,11 +1,11 @@
 // obj.hpp
-#ifndef LOAD_MESH_HPP
-#define LOAD_MESH_HPP
+#ifndef LOAD_MESH_CUH
+#define LOAD_MESH_CUH
 
-#include "../shapes/triangle.hpp"
-#include "../shapes/sphere.hpp"
-#include "../shapes/mesh.hpp"
-#include "util.hpp"
+#include "../shapes/triangle.cuh"
+#include "../shapes/sphere.cuh"
+#include "../shapes/mesh.cuh"
+#include "util.cuh"
 
 class LoadMesh {
 public:

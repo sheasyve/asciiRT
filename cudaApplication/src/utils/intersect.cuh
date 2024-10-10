@@ -1,10 +1,10 @@
-#ifndef INTERSECT_HPP
-#define INTERSECT_HPP
-#include "util.hpp"
-#include "ray.hpp"
-#include "../shapes/triangle.hpp"
-#include "../shapes/sphere.hpp"
-#include "../shapes/mesh.hpp"
+#ifndef INTERSECT_CUH
+#define INTERSECT_CUH
+#include "util.cuh"
+#include "ray.cuh"
+#include "../shapes/triangle.cuh"
+#include "../shapes/sphere.cuh"
+#include "../shapes/mesh.cuh"
 
 
 class Intersect {

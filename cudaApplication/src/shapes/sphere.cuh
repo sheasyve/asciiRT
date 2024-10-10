@@ -1,8 +1,8 @@
-#ifndef SPHERE_HPP
-#define SPHERE_HPP
+#ifndef SPHERE_CUH
+#define SPHERE_CUH
 
-#include "../utils/util.hpp"
-#include "../utils/ray.hpp"
+#include "../utils/util.cuh"
+#include "../utils/ray.cuh"
 
 class Sphere {
 public:

@@ -1,9 +1,8 @@
 // obj.cpp
-#include "load_mesh.hpp"
+#include "load_mesh.cuh"
 
 LoadMesh::LoadMesh(const Eigen::Matrix4d& transform) {
     std::vector<Eigen::Vector4d> points;
-    points.push_back(Eigen::Vector4d(0., 0., 0., 0.));  // .obj is one-indexed
     for (std::string line; std::getline(std::cin, line);) {
         std::stringstream line_stream(line);
         std::string prefix;

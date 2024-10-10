@@ -1,4 +1,4 @@
-#include "utils/main_util.hpp"
+#include "utils/main_util.cuh"
 
 // Camera settings
 const double focal_length = 2.16;

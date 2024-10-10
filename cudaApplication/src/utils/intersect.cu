@@ -1,4 +1,4 @@
-#include "intersect.hpp"
+#include "intersect.cuh"
 
 //This class returns the intersection based on shape type
 

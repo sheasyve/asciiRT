@@ -1,13 +1,13 @@
-#ifndef PRINT_UTIL_HPP
-#define PRINT_UTIL_HPP
+#ifndef PRINT_UTIL_CUH
+#define PRINT_UTIL_CUH
 
-#include "util.hpp"
-#include "ray.hpp"
-#include "load_mesh.hpp"
-#include "intersect.hpp"
-#include "../shapes/triangle.hpp"
-#include "../shapes/sphere.hpp"
-#include "../shapes/mesh.hpp"
+#include "util.cuh"
+#include "ray.cuh"
+#include "load_mesh.cuh"
+#include "intersect.cuh"
+#include "../shapes/triangle.cuh"
+#include "../shapes/sphere.cuh"
+#include "../shapes/mesh.cuh"
 
 std::pair<int, int> find_boundary(const Eigen::MatrixXd &Color, int w, int h) {
     int first_line = -1,last_line = -1;
