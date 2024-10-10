@@ -20,6 +20,7 @@ add_executable(${PROJECT_NAME}
     src/shapes/mesh.cu        # Add this line to include mesh.cpp
     src/shapes/sphere.cu      # Add this line to include sphere.cpp
     src/utils/intersect.cu
+    src/cuda_rt.cu
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:

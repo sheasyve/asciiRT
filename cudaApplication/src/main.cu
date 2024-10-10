@@ -1,4 +1,5 @@
 #include "utils/main_util.cuh"
+#include "cuda_rt.cuh"
 
 // Camera settings
 const double focal_length = 2.16;
@@ -28,54 +29,54 @@ Eigen::Vector3d compute_normal(const std::variant<Triangle, Sphere, Mesh> &obj, 
     }, obj);
 }
 
-std::optional<std::tuple<double, Eigen::Vector3d, Intersectable, const Triangle *>> find_nearest_object(const Ray &ray){
-    //Find the nearest intersecting mesh or sphere
-    std::optional<std::tuple<double, Eigen::Vector3d, Intersectable, const Triangle *>> nearest_hit;
-    double min_t = INFINITY;
-    for (const auto &object : objects){
-        auto hit = std::visit(Intersect(ray), object);//Find intersection based on this object type
-        if (hit.has_value()){
-            double t = std::get<0>(hit.value());
-            if (t < min_t){
-                min_t = t;
-                const Triangle *hit_triangle = nullptr;
-                if (std::holds_alternative<Mesh>(object)){//Mesh
-                    const Mesh &mesh = std::get<Mesh>(object);
-                    auto mesh_hit = mesh.intersects(ray);
-                    if (mesh_hit.has_value()) hit_triangle = std::get<2>(mesh_hit.value()); // Get the hit triangle
-                }
-                // For Sphere, hit_triangle remains nullptr.
-                nearest_hit = std::make_tuple(t, std::get<1>(hit.value()), object, hit_triangle);
-            }
-        }
-    }
-    return nearest_hit;
-}
+//std::optional<std::tuple<double, Eigen::Vector3d, Intersectable, const Triangle *>> find_nearest_object(const Ray &ray){
+//    //Find the nearest intersecting mesh or sphere
+//    std::optional<std::tuple<double, Eigen::Vector3d, Intersectable, const Triangle *>> nearest_hit;
+//    double min_t = INFINITY;
+//    for (const auto &object : objects){
+//        auto hit = std::visit(Intersect(ray), object);//Find intersection based on this object type
+//        if (hit.has_value()){
+//            double t = std::get<0>(hit.value());
+//            if (t < min_t){
+//                min_t = t;
+//                const Triangle *hit_triangle = nullptr;
+//                if (std::holds_alternative<Mesh>(object)){//Mesh
+//                    const Mesh &mesh = std::get<Mesh>(object);
+//                    auto mesh_hit = mesh.intersects(ray);
+//                    if (mesh_hit.has_value()) hit_triangle = std::get<2>(mesh_hit.value()); // Get the hit triangle
+//                }
+//                // For Sphere, hit_triangle remains nullptr.
+//                nearest_hit = std::make_tuple(t, std::get<1>(hit.value()), object, hit_triangle);
+//            }
+//        }
+//    }
+//    return nearest_hit;
+//}
 
-Eigen::Vector3d shoot_ray(const Ray &ray){
-    Eigen::Vector3d color(0., 0., 0.);
-    auto nearest_hit = find_nearest_object(ray);
-    if (nearest_hit.has_value()){
-        const auto &[t, hit_point, nearest_object, hit_triangle] = nearest_hit.value();
-        Eigen::Vector3d normal = compute_normal(nearest_object, hit_point, hit_triangle);
-        // Lighting calculations
-        for (const Eigen::Vector3d &light_pos : light_positions){
-            Eigen::Vector3d L = (light_pos - hit_point).normalized();
-            double lambertian = std::max(normal.dot(L), 0.0);
-            color += lambertian * Eigen::Vector3d(1., 1., 1.);
-        }
-    }
-    return color;
-}
+//Eigen::Vector3d shoot_ray(const Ray &ray){
+//    Eigen::Vector3d color(0., 0., 0.);
+//    auto nearest_hit = find_nearest_object(ray);
+//    if (nearest_hit.has_value()){
+//        const auto &[t, hit_point, nearest_object, hit_triangle] = nearest_hit.value();
+//        Eigen::Vector3d normal = compute_normal(nearest_object, hit_point, hit_triangle);
+//        // Lighting calculations
+//        for (const Eigen::Vector3d &light_pos : light_positions){
+//            Eigen::Vector3d L = (light_pos - hit_point).normalized();
+//            double lambertian = std::max(normal.dot(L), 0.0);
+//            color += lambertian * Eigen::Vector3d(1., 1., 1.);
+//        }
+//    }
+//    return color;
+//}
 
-void print_scene_in_ascii(const Eigen::MatrixXd &Color, int w, int h) {
+void print_scene_in_ascii(double* color, int w, int h) {
     // ASCII characters for brightness levels
     const std::string brightness_chars = " `.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@";
     const int l = brightness_chars.size() - 1;
-    auto [first_line, last_line] = find_boundary(Color, w, h);
+    auto [first_line, last_line] = find_boundary(color, w, h);
     for (int j = first_line; j >= last_line; --j) {
         for (int i = 0; i < w; ++i) {
-            double brightness = Color(i, j);
+            double brightness = color[j*w + i];
             brightness = std::max(0.0, std::min(1.0, brightness)); // Clamp brightness between 0 and 1
             char c = brightness_chars[static_cast<int>(l * brightness)];
             std::cout << c;
@@ -84,34 +85,34 @@ void print_scene_in_ascii(const Eigen::MatrixXd &Color, int w, int h) {
     }
 }
 
-void raytrace(int w, int h){
-    Eigen::MatrixXd Color = Eigen::MatrixXd::Zero(w, h); 
-    const double aspect_ratio = double(w) / double(h);
-    const double y = (((focal_length)*sin(field_of_view / 2)) / sin((180 - (90 + ((field_of_view * (180 / M_PI) / 2)))) * (M_PI / 180)));
-    const double x = (y * aspect_ratio);
-    Eigen::Vector3d image_origin(-x, y, camera_position[2] - focal_length);
-    Eigen::Vector3d x_displacement(2.0 / w * x, 0, 0);
-    Eigen::Vector3d y_displacement(0, -2.0 / h * y, 0);
-    for (unsigned i = 0; i < w; ++i){
-        for (unsigned j = 0; j < h; ++j){
-            Eigen::Vector3d pixel_center = image_origin + (i + 0.5) * x_displacement + (j + 0.5) * y_displacement;
-            Ray r(camera_position, (camera_position - pixel_center).normalized());
-            Eigen::Vector3d result = shoot_ray(r);
-            if (result.size() > 0){
-                Color(i, j) = result(0);
-            }
-            else{
-                std::cerr << "Invalid ray result." << std::endl;
-            }
-        }
-    }
-    print_scene_in_ascii(Color, w, h);
-}
+//void raytrace(int w, int h){
+//    Eigen::MatrixXd Color = Eigen::MatrixXd::Zero(w, h); 
+//    const double aspect_ratio = double(w) / double(h);
+//    const double y = (((focal_length)*sin(field_of_view / 2)) / sin((180 - (90 + ((field_of_view * (180 / M_PI) / 2)))) * (M_PI / 180)));
+//    const double x = (y * aspect_ratio);
+//    Eigen::Vector3d image_origin(-x, y, camera_position[2] - focal_length);
+//    Eigen::Vector3d x_displacement(2.0 / w * x, 0, 0);
+//    Eigen::Vector3d y_displacement(0, -2.0 / h * y, 0);
+//    for (unsigned i = 0; i < w; ++i){
+//        for (unsigned j = 0; j < h; ++j){
+//            Eigen::Vector3d pixel_center = image_origin + (i + 0.5) * x_displacement + (j + 0.5) * y_displacement;
+//            Ray r(camera_position, (camera_position - pixel_center).normalized());
+//            Eigen::Vector3d result = shoot_ray(r);
+//            if (result.size() > 0){
+//                Color(i, j) = result(0);
+//            }
+//            else{
+//                std::cerr << "Invalid ray result." << std::endl;
+//            }
+//        }
+//    }
+//    print_scene_in_ascii(Color, w, h);
+//}
 
 void setup_scene(){
-    LoadMesh m(Eigen::Matrix4d::Identity()); //Mesh
-    Mesh mesh = m.get_mesh();           
-    if (!mesh.triangles.empty()) objects.emplace_back(mesh);// Add mesh to objects
+    // LoadMesh m(Eigen::Matrix4d::Identity()); //Mesh
+    // Mesh mesh = m.get_mesh();           
+    // if (!mesh.triangles.empty()) objects.emplace_back(mesh);// Add mesh to objects
     //Sphere example
     //Eigen::Vector3d sphere_center(0, 0, 1);               
     //objects.emplace_back(Sphere(sphere_center, 1.));            
@@ -121,9 +122,32 @@ void setup_scene(){
     light_colors.emplace_back(16, 16, 16, 0);  // Light intensity
 }
 
+std::vector<Ray> gen_rays(int w, int h) {
+    std::vector<Ray> rays;
+    const double aspect_ratio = double(w) / double(h);
+    const double y = (((focal_length)*sin(field_of_view / 2)) / sin((180 - (90 + ((field_of_view * (180 / M_PI) / 2)))) * (M_PI / 180)));
+    const double x = (y * aspect_ratio);
+    Eigen::Vector3d image_origin(-x, y, camera_position[2] - focal_length);
+    Eigen::Vector3d x_displacement(2.0 / w * x, 0, 0);
+    Eigen::Vector3d y_displacement(0, -2.0 / h * y, 0);
+    for (int j = 0; j < h; j++) {
+        for (int i = 0; i < w; i++) {
+            Eigen::Vector3d pixel_center = image_origin + (i + 0.5) * x_displacement + (j + 0.5) * y_displacement;
+            Ray r(camera_position, (camera_position - pixel_center).normalized());
+            rays.push_back(r);
+        }
+    }
+    return rays;
+}
+
 int main(){
-    int w = 181, h = 101;
+    int w = 500, h = 500;
+    // int w = 10, h = 10;
     setup_scene();
-    raytrace(w, h);
+    // raytrace(w, h);
+    LoadMesh m(Eigen::Matrix4d::Identity()); //Mesh
+    Mesh mesh = m.get_mesh();
+    double* output = h_raytrace(&gen_rays(w, h)[0], mesh, w, h, light_positions);
+    print_scene_in_ascii(output, w, h);
     return 0;
 }
