@@ -6,9 +6,10 @@
 
 <https://docs.docker.com/desktop/>
 
-### Run commands in the cppapplication directory
+### Run commands in the build directory
 
 ```bash
-sudo docker build -t ascii_rt .
-sudo docker run -i ascii_rt < ../models/teapot.obj
+cmake ..
+make
+./ascii_rt < ../../models/toyota.obj
 ```

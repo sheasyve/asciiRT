@@ -79,14 +79,13 @@ std::vector<Ray> gen_rays(int w, int h) {
 
 int main(){
     int w = 112*2, h = 224*2;
-    // int w = 10, h = 10;
     setup_scene();
     // raytrace(w, h);
-    LoadMesh m(Eigen::Matrix4d::Identity()); //Mesh
+    LoadMesh m(Eigen::Matrix4d::Identity()); 
     Mesh mesh = m.get_mesh();
     //Rotation IN RADIANS
     double rX =-.05, rY =.4, rZ =.05;
-    double* output = h_raytrace(&gen_rays(w, h)[0], mesh, w, h, light_positions,light_colors,rX,rY,rZ);
+    double* output = h_raytrace(&gen_rays(w, h)[0], mesh, w, h, light_positions,light_colors,rX,rY,rZ);//Cuda Kernel
     print_scene_in_ascii(output, w, h);
     return 0;
 }
