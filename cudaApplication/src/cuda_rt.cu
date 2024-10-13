@@ -84,7 +84,7 @@ double* h_raytrace(
     Eigen::Vector3d* d_lights = nullptr;
     Eigen::Vector4d* d_light_colors = nullptr;
 
-    //Rotation
+    //Rotation, should move this to a function in main or ideally it's own. CUDA kernel before this one. but this works for now
     Eigen::Matrix3d rotMatX;
     rotMatX = Eigen::AngleAxisd(rX, Eigen::Vector3d::UnitX());
     Eigen::Matrix3d rotMatY;
@@ -92,8 +92,6 @@ double* h_raytrace(
     Eigen::Matrix3d rotMatZ;
     rotMatZ = Eigen::AngleAxisd(rZ, Eigen::Vector3d::UnitZ());
     Eigen::Matrix3d rotationMatrix = rotMatZ * rotMatY * rotMatX;
-
-    //Rotate each triangle
     std::vector<Triangle> rotated_triangles = mesh.triangles;
     for (auto& tri : rotated_triangles) {
         tri.p1 = rotationMatrix * tri.p1;
