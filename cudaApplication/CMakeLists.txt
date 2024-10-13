@@ -33,7 +33,7 @@ target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:
                        --expt-relaxed-constexpr
                        >)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES CUDA_ARCHITECTURES "50")
+set_target_properties(${PROJECT_NAME} PROPERTIES CUDA_ARCHITECTURES "60;61;70")
 set_target_properties(${PROJECT_NAME} PROPERTIES CUDA_RESOLVE_DEVICE_SYMBOLS ON)
 set_target_properties(${PROJECT_NAME} PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 target_link_libraries(${PROJECT_NAME} Eigen3::Eigen)
