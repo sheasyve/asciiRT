@@ -1,4 +1,4 @@
-# ASCII_RT
+# Ascii_RT
 #### There is a c++ version and a CUDA version in respective folders.
 
 - *CUDA application*
