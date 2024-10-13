@@ -89,7 +89,6 @@ int main(int argc, char* argv[]){
         }
         input_stream = &file_stream; 
     } else {
-        std::cout << "file? " << std::endl;
         input_stream = &std::cin;  
     }
     
