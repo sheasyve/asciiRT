@@ -1,5 +1,5 @@
-#ifndef UTIL_HPP
-#define UTIL_HPP
+#ifndef UTIL_CUH
+#define UTIL_CUH
 
 #include <iostream>
 #include <vector>

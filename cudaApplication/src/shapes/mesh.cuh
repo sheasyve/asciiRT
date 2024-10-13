@@ -1,11 +1,11 @@
-#ifndef MESH_HPP
-#define MESH_HPP
+#ifndef MESH_CUH
+#define MESH_CUH
 
 #include <vector>
 #include <optional>
 #include <tuple>
-#include "triangle.hpp"
-#include "../utils/ray.hpp"
+#include "triangle.cuh"
+#include "../utils/ray.cuh"
 
 class Mesh {
 public:
