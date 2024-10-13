@@ -77,12 +77,27 @@ std::vector<Ray> gen_rays(int w, int h) {
     return rays;
 }
 
-int main(){
-    int w = 112*2, h = 224*2;
+int main(int argc, char* argv[]){
+    std::istream *input_stream = nullptr;
+    std::ifstream file_stream;
+    if (argc >= 2) {
+        std::string obj_file_path = argv[1];
+        file_stream.open(obj_file_path);
+        if (!file_stream) {
+            std::cerr << "can't open file" << std::endl;
+            return 1;
+        }
+        input_stream = &file_stream; 
+    } else {
+        std::cout << "file? " << std::endl;
+        input_stream = &std::cin;  
+    }
+    
     setup_scene();
-    // raytrace(w, h);
-    LoadMesh m(Eigen::Matrix4d::Identity()); 
+    LoadMesh m(Eigen::Matrix4d::Identity(), *input_stream);
     Mesh mesh = m.get_mesh();
+    int w = 112*2, h = 224*2;
+    
     //Rotation IN RADIANS
     double rX =-.05, rY =.4, rZ =.05;
     double* output = h_raytrace(&gen_rays(w, h)[0], mesh, w, h, light_positions,light_colors,rX,rY,rZ);//Cuda Kernel
