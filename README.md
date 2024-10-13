@@ -1,10 +1,10 @@
 # cuda_project
-#### For now, a basic c++ implementation has been started in the cppapplication folder.
-#### Installing this with docker should be somewhat simple for any operating system, so we dont need to use colab just yet.
+#### There is a c++ version and a CUDA version in respective folders.
 
-- **Keep Docker in Mind**:  
-  Make sure changes work with our Docker setup so things remain easy for everyone, regardless of the OS.
-  
+- *CUDA application*
+Build with cmake.
+- *C++ application*
+Build with docker.
 - **Main Branch (`main`)**:  
   Don’t commit directly to `main` to save your work unless it's a small, safe change.
   
