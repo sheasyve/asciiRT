@@ -84,7 +84,7 @@ double* h_raytrace(
     Eigen::Vector3d* d_lights = nullptr;
     Eigen::Vector4d* d_light_colors = nullptr;
 
-    //Rotation, should move this to a function in main or ideally it's own. CUDA kernel before this one. but this works for now
+    //Rotation, should move this to a function in main or ideally it's own CUDA kernel before this one. but this works for now.
     Eigen::Matrix3d rotMatX;
     rotMatX = Eigen::AngleAxisd(rX, Eigen::Vector3d::UnitX());
     Eigen::Matrix3d rotMatY;
