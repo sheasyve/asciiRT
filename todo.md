@@ -1,4 +1,4 @@
-- Toggle for rotation (default off for now)
+- Toggle for rotation code (default off for now)
 - Bring changes to c++ version (shading and rotation) and get same settings comparison
 Bring rotation to seperate rotation kernel and parallelize matrix multiply
 - Shadows
