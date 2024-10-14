@@ -17,11 +17,12 @@ std::vector<Eigen::Vector3d> light_positions;
 std::vector<Eigen::Vector4d> light_colors;
 
 // Shader settings
-double brightness = 0.005;//Start with ambient light
-double diffuse_intensity = 0.4;
-double specular_intensity = 0.4;
-double shine = 32.0;
-double a = 1., b = .1, c = .01;//Attenuation constants
+const double brightness = 0.005;//Start with ambient light
+const double diffuse_intensity = 0.4;
+const double specular_intensity = 0.4;
+const double ambient_light = 0.1;
+const double shine = 32.0;
+const double a = 1., b = .1, c = .01;//Attenuation constants
 
 // Variant to store different objects
 using Intersectable = std::variant<Triangle, Sphere, Mesh>;
@@ -84,9 +85,10 @@ std::optional<std::tuple<double, Eigen::Vector3d, Intersectable, const Triangle 
 }
 
 Eigen::Vector3d shoot_ray(const Ray &ray) {
-    Eigen::Vector3d color(0., 0., 0.);
+    Eigen::Vector3d color(0., 0., 0.); 
     auto nearest_hit = find_nearest_object(ray);
     if (nearest_hit.has_value()) {
+        double brightness = ambient_light;
         const auto &[t, hit_point, nearest_object, hit_triangle] = nearest_hit.value();
         Eigen::Vector3d N = compute_normal(nearest_object, hit_point, hit_triangle);
         N.normalize();
@@ -98,18 +100,20 @@ Eigen::Vector3d shoot_ray(const Ray &ray) {
             L.normalize();
             Eigen::Vector3d light_rgb = light_colors[i].head<3>();
             double attenuation = 1. / (a + b * d + c * d * d);
+            // Diffuse shading
             double lambertian = N.dot(L);
             lambertian = fmax(lambertian, 0.0);
-            color += attenuation * diffuse_intensity * lambertian * light_rgb;
-
+            brightness += attenuation * diffuse_intensity * lambertian * light_rgb.norm();
+            // Specular shading
             Eigen::Vector3d R = (2.0 * N.dot(L) * N - L).normalized();
             double spec_angle = R.dot(V);
             spec_angle = fmax(spec_angle, 0.0);
             double specular = pow(spec_angle, shine);
-            color += attenuation * specular_intensity * specular * light_rgb;
+            brightness += attenuation * specular_intensity * specular * light_rgb.norm();
         }
+        brightness = fmin(brightness, 1.0);
+        color = Eigen::Vector3d(brightness, brightness, brightness); 
     }
-    color = color.cwiseMin(1.0);  // Limit the color values to 1.0 (per channel)
     return color;
 }
 
@@ -121,7 +125,7 @@ void print_scene_in_ascii(const Eigen::MatrixXd &Color, int w, int h) {
     for (int j = first_line; j >= last_line; --j) {
         for (int i = 0; i < w; ++i) {
             double brightness = Color(i, j);
-            brightness = std::max(0.0, std::min(1.0, brightness)); // Clamp brightness between 0 and 1
+            brightness = std::max(0.0, std::min(1.0, brightness)); 
             char c = brightness_chars[static_cast<int>(l * brightness)];
             std::cout << c;
         }
@@ -188,7 +192,10 @@ void setup_scene(int argc, char* argv[]){
 }
 
 int main(int argc, char* argv[]){
+    auto start=std::chrono::high_resolution_clock::now();
     setup_scene(argc,argv);
     raytrace(w, h);
+    auto end=std::chrono::high_resolution_clock::now();
+    std::cout<<"Runtime: "<<std::chrono::duration<double>(end-start).count()<<" seconds"<<std::endl;
     return 0;
 }
