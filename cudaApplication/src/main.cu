@@ -113,7 +113,6 @@ std::vector<Ray> gen_rays(int w, int h) {
     return rays;
 }
 
-#include <chrono>
 int main(int argc,char* argv[]){
     auto start=std::chrono::high_resolution_clock::now();
     setup_scene();

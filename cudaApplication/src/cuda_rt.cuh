@@ -5,7 +5,6 @@
 #include "utils/ray.cuh"
 #include "shapes/mesh.cuh"
 
-
 double* h_raytrace(Ray* rays, Mesh mesh, int width, int height, std::vector<Eigen::Vector3d> light_positions, std::vector<Eigen::Vector4d> light_colors);
 
 #endif
