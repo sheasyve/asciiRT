@@ -69,8 +69,7 @@ double* h_raytrace(
     Ray* rays, Mesh mesh,
     int width, int height,
     std::vector<Eigen::Vector3d> light_positions,
-    std::vector<Eigen::Vector4d> light_colors,
-    double rX, double rY, double rZ
+    std::vector<Eigen::Vector4d> light_colors
 ) {
     int size = width * height;
     int num_triangles = mesh.triangles.size();
@@ -80,24 +79,12 @@ double* h_raytrace(
 
     Ray* d_rays = nullptr;
     Triangle* d_triangles = nullptr;
+    std::vector<Triangle> triangles = mesh.triangles;
     double* d_output = nullptr;
     Eigen::Vector3d* d_lights = nullptr;
     Eigen::Vector4d* d_light_colors = nullptr;
 
-    //Rotation, should move this to a function in main or ideally it's own CUDA kernel before this one. but this works for now.
-    Eigen::Matrix3d rotMatX;
-    rotMatX = Eigen::AngleAxisd(rX, Eigen::Vector3d::UnitX());
-    Eigen::Matrix3d rotMatY;
-    rotMatY = Eigen::AngleAxisd(rY, Eigen::Vector3d::UnitY());
-    Eigen::Matrix3d rotMatZ;
-    rotMatZ = Eigen::AngleAxisd(rZ, Eigen::Vector3d::UnitZ());
-    Eigen::Matrix3d rotationMatrix = rotMatZ * rotMatY * rotMatX;
-    std::vector<Triangle> rotated_triangles = mesh.triangles;
-    for (auto& tri : rotated_triangles) {
-        tri.p1 = rotationMatrix * tri.p1;
-        tri.p2 = rotationMatrix * tri.p2;
-        tri.p3 = rotationMatrix * tri.p3;
-    }
+    
 
     cudaMalloc((void**)&d_rays, size * sizeof(Ray));
     cudaMalloc((void**)&d_triangles, num_triangles * sizeof(Triangle));
@@ -106,7 +93,7 @@ double* h_raytrace(
     cudaMalloc((void**)&d_light_colors, num_lights * sizeof(Eigen::Vector4d));
 
     cudaMemcpy(d_rays, rays, size * sizeof(Ray), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_triangles, rotated_triangles.data(), num_triangles * sizeof(Triangle), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_triangles, triangles.data(), num_triangles * sizeof(Triangle), cudaMemcpyHostToDevice);
     cudaMemcpy(d_lights, light_positions.data(), num_lights * sizeof(Eigen::Vector3d), cudaMemcpyHostToDevice);
     cudaMemcpy(d_light_colors, light_colors.data(), num_lights * sizeof(Eigen::Vector4d), cudaMemcpyHostToDevice);
 
