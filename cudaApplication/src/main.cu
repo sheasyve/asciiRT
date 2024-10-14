@@ -1,10 +1,17 @@
 #include "utils/main_util.cuh"
 #include "cuda_rt.cuh"
 
+// Scene settings
+int w = 112*2, h = 224*2;
+
 // Camera settings
 const double focal_length = 2.16;
 const double field_of_view = 0.7854; // 45 degrees
 const Eigen::Vector3d camera_position(0, 0, -100);
+
+// Rotation settings
+bool rotate = false;
+double rX =-.05, rY =.4, rZ =.05;//Rotation IN RADIANS
 
 // Lights
 std::vector<Eigen::Vector3d> light_positions;
@@ -13,7 +20,6 @@ std::vector<Eigen::Vector4d> light_colors;
 // Variant to store different objects
 using Intersectable = std::variant<Triangle, Sphere, Mesh>;
 std::vector<Intersectable> objects;
-
 
 Mesh input_mesh(int argc, char* argv[]) {
     std::istream* input_stream = nullptr;
@@ -26,9 +32,8 @@ Mesh input_mesh(int argc, char* argv[]) {
             throw std::runtime_error("File opening failed.");
         }
         input_stream = &file_stream;
-    } else {
-        input_stream = &std::cin;
-    }
+    } 
+    else input_stream = &std::cin;
     LoadMesh m(Eigen::Matrix4d::Identity(), *input_stream);
     return m.get_mesh();
 }
@@ -40,9 +45,7 @@ Eigen::Vector3d compute_normal(const std::variant<Triangle, Sphere, Mesh> &obj, 
         } else if constexpr (std::is_same_v<decltype(shape), const Triangle&>) {//Triangle
             return shape.normal();
         } else if constexpr (std::is_same_v<decltype(shape), const Mesh&>) {//Mesh
-            if (hit_triangle != nullptr) {
-                return hit_triangle->normal();  
-            }
+            if (hit_triangle != nullptr) return hit_triangle->normal();  
             return Eigen::Vector3d(0, 0, 0);  // No valid hit triangle, fallback
         }
     }, obj);
@@ -65,17 +68,31 @@ void print_scene_in_ascii(double* color, int w, int h) {
 }
 
 void setup_scene(){ 
-    light_colors.emplace_back(0.8, 0.8, 0.8, 1);  
+    light_colors.emplace_back(0.8, 0.8, 0.8, 1);//Light 1
     light_positions.emplace_back(0, 5, -30);  
-
-    light_colors.emplace_back(0.4, 0.4, 0.4, 1); 
+    light_colors.emplace_back(0.4, 0.4, 0.4, 1);//Light 2
     light_positions.emplace_back(10, -5, -20);  
-
-    light_colors.emplace_back(0.3, 0.3, 0.3, 1);  
+    light_colors.emplace_back(0.3, 0.3, 0.3, 1);//Light 3  
     light_positions.emplace_back(10, 5, 20);  
-
-    light_colors.emplace_back(0.2, 0.2, 0.2, 1);  
+    light_colors.emplace_back(0.2, 0.2, 0.2, 1);//Light 4  
     light_positions.emplace_back(-10, 20, -30);  
+}
+
+std::vector<Triangle> rotate_mesh(Mesh& mesh, double rX, double rY, double rZ){
+    Eigen::Matrix3d rotMatX;
+    rotMatX = Eigen::AngleAxisd(rX, Eigen::Vector3d::UnitX());
+    Eigen::Matrix3d rotMatY;
+    rotMatY = Eigen::AngleAxisd(rY, Eigen::Vector3d::UnitY());
+    Eigen::Matrix3d rotMatZ;
+    rotMatZ = Eigen::AngleAxisd(rZ, Eigen::Vector3d::UnitZ());
+    Eigen::Matrix3d rotationMatrix = rotMatZ * rotMatY * rotMatX;
+    std::vector<Triangle> rotated_triangles = mesh.triangles;
+    for (auto& tri : rotated_triangles) {
+        tri.p1 = rotationMatrix * tri.p1;
+        tri.p2 = rotationMatrix * tri.p2;
+        tri.p3 = rotationMatrix * tri.p3;
+    }
+    return rotated_triangles;
 }
 
 std::vector<Ray> gen_rays(int w, int h) {
@@ -96,30 +113,10 @@ std::vector<Ray> gen_rays(int w, int h) {
     return rays;
 }
 
-std::vector<Triangle> rotate_triangles(Mesh& mesh, double rX, double rY, double rZ){
-    Eigen::Matrix3d rotMatX;
-    rotMatX = Eigen::AngleAxisd(rX, Eigen::Vector3d::UnitX());
-    Eigen::Matrix3d rotMatY;
-    rotMatY = Eigen::AngleAxisd(rY, Eigen::Vector3d::UnitY());
-    Eigen::Matrix3d rotMatZ;
-    rotMatZ = Eigen::AngleAxisd(rZ, Eigen::Vector3d::UnitZ());
-    Eigen::Matrix3d rotationMatrix = rotMatZ * rotMatY * rotMatX;
-    std::vector<Triangle> rotated_triangles = mesh.triangles;
-    for (auto& tri : rotated_triangles) {
-        tri.p1 = rotationMatrix * tri.p1;
-        tri.p2 = rotationMatrix * tri.p2;
-        tri.p3 = rotationMatrix * tri.p3;
-    }
-    return rotated_triangles;
-}
-
 int main(int argc, char* argv[]){
     setup_scene();
-    int w = 112*2, h = 224*2;
-    double rX =-.05, rY =.4, rZ =.05;//Rotation IN RADIANS
-    bool rotate = false;
     Mesh mesh = input_mesh(argc, argv);
-    if(rotate) mesh.triangles = rotate_triangles(mesh, rX, rY, rZ);
+    if(rotate) mesh.triangles = rotate_mesh(mesh, rX, rY, rZ);
     double* output = h_raytrace(&gen_rays(w, h)[0], mesh, w, h, light_positions,light_colors);//Cuda Kernel
     print_scene_in_ascii(output, w, h);
     return 0;

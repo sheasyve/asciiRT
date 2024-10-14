@@ -10,6 +10,7 @@
 #include "../shapes/mesh.cuh"
 
 std::pair<int, int> find_boundary(double* color, int w, int h) {
+    //Find the first and last non-empty lines to print without extra whitespace
     int first_line = -1,last_line = -1;
     for (int j = h - 1; j >= 0; --j) {
         for (int i = 0; i < w; ++i) {
@@ -22,7 +23,7 @@ std::pair<int, int> find_boundary(double* color, int w, int h) {
             }
         }
     }
-    return {first_line, last_line};  // Return a pair of the first and last non-empty line indices
+    return {first_line, last_line}; 
 }
 
 #endif //PRINT_UTIL_HPP

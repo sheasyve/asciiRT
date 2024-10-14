@@ -84,8 +84,6 @@ double* h_raytrace(
     Eigen::Vector3d* d_lights = nullptr;
     Eigen::Vector4d* d_light_colors = nullptr;
 
-    
-
     cudaMalloc((void**)&d_rays, size * sizeof(Ray));
     cudaMalloc((void**)&d_triangles, num_triangles * sizeof(Triangle));
     cudaMalloc((void**)&d_output, size * sizeof(double));
