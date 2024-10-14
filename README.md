@@ -14,3 +14,6 @@ Build with docker.
 
 - **Avoid Overlap**:  
   Let everyone know what you’re working on to avoid two people doing the same thing. Just a quick message or note is enough.
+
+- **Google Colab**:
+  https://colab.research.google.com/drive/1Vc-MHqLp9ryGMzQ0li7SxytBWm98GkcD#scrollTo=KltHsC4JCsFw
