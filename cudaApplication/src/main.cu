@@ -14,6 +14,25 @@ std::vector<Eigen::Vector4d> light_colors;
 using Intersectable = std::variant<Triangle, Sphere, Mesh>;
 std::vector<Intersectable> objects;
 
+
+Mesh input_mesh(int argc, char* argv[]) {
+    std::istream* input_stream = nullptr;
+    std::ifstream file_stream;
+    if (argc >= 2) {
+        std::string obj_file_path = argv[1];
+        file_stream.open(obj_file_path);
+        if (!file_stream) {
+            std::cerr << "can't open file" << std::endl;
+            throw std::runtime_error("File opening failed.");
+        }
+        input_stream = &file_stream;
+    } else {
+        input_stream = &std::cin;
+    }
+    LoadMesh m(Eigen::Matrix4d::Identity(), *input_stream);
+    return m.get_mesh();
+}
+
 Eigen::Vector3d compute_normal(const std::variant<Triangle, Sphere, Mesh> &obj, const Eigen::Vector3d &hit_point, const Triangle *hit_triangle = nullptr){
     return std::visit([&](const auto &shape) -> Eigen::Vector3d{
         if constexpr (std::is_same_v<decltype(shape), const Sphere&>) {//Sphere
@@ -78,26 +97,10 @@ std::vector<Ray> gen_rays(int w, int h) {
 }
 
 int main(int argc, char* argv[]){
-    std::istream *input_stream = nullptr;
-    std::ifstream file_stream;
-    if (argc >= 2) {
-        std::string obj_file_path = argv[1];
-        file_stream.open(obj_file_path);
-        if (!file_stream) {
-            std::cerr << "can't open file" << std::endl;
-            return 1;
-        }
-        input_stream = &file_stream; 
-    } else 
-        input_stream = &std::cin;  
-    
+    Mesh mesh = input_mesh(argc, argv);
     setup_scene();
-    LoadMesh m(Eigen::Matrix4d::Identity(), *input_stream);
-    Mesh mesh = m.get_mesh();
     int w = 112*2, h = 224*2;
-    
-    //Rotation IN RADIANS
-    double rX =-.05, rY =.4, rZ =.05;
+    double rX =-.05, rY =.4, rZ =.05;//Rotation IN RADIANS
     double* output = h_raytrace(&gen_rays(w, h)[0], mesh, w, h, light_positions,light_colors,rX,rY,rZ);//Cuda Kernel
     print_scene_in_ascii(output, w, h);
     return 0;
