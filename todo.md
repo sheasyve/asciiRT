@@ -1,16 +1,10 @@
-- Toggle for rotation code (default off for now)
-- Bring changes to c++ version (shading and rotation) and get same settings comparison
-Bring rotation to seperate rotation kernel and parallelize matrix multiply
+- Bring rotation to seperate rotation kernel and parallelize matrix multiply
 - Shadows
 - Reflections ( maybe unneccecary)
 - Animate rotation 
 - Optimize CUDA usage
-- RT cores
 - More obj models
-- Bvh tree
-- Colab version
+- Bvh tree with RT cores and without
 - Report
-- Clean code
-- Spheres
-- Planes
+- Spheres and planes?
 - Multiple object loading and placement
