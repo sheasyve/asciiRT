@@ -17,33 +17,16 @@ std::vector<Eigen::Vector3d> light_positions;
 std::vector<Eigen::Vector4d> light_colors;
 
 // Shader settings
-const double brightness = 0.005;//Start with ambient light
 const double diffuse_intensity = 0.4;
 const double specular_intensity = 0.4;
-const double ambient_light = 0.1;
+const double ambient_light = 0.005;
 const double shine = 32.0;
 const double a = 1., b = .1, c = .01;//Attenuation constants
 
 // Variant to store different objects
 using Intersectable = std::variant<Triangle, Sphere, Mesh>;
 std::vector<Intersectable> objects;
-
-Mesh input_mesh(int argc, char* argv[]) {
-    std::istream* input_stream = nullptr;
-    std::ifstream file_stream;
-    if (argc >= 2) {
-        std::string obj_file_path = argv[1];
-        file_stream.open(obj_file_path);
-        if (!file_stream) {
-            std::cerr << "can't open file" << std::endl;
-            throw std::runtime_error("File opening failed.");
-        }
-        input_stream = &file_stream;
-    } 
-    else input_stream = &std::cin;
-    LoadMesh m(Eigen::Matrix4d::Identity(), *input_stream);
-    return m.get_mesh();
-}
+std::vector<Mesh> meshes;
 
 Eigen::Vector3d compute_normal(const std::variant<Triangle, Sphere, Mesh> &obj, const Eigen::Vector3d &hit_point, const Triangle *hit_triangle = nullptr){
     return std::visit([&](const auto &shape) -> Eigen::Vector3d{
@@ -133,23 +116,6 @@ void print_scene_in_ascii(const Eigen::MatrixXd &Color, int w, int h) {
     }
 }
 
-std::vector<Triangle> rotate_mesh(Mesh& mesh, double rX, double rY, double rZ){
-    Eigen::Matrix3d rotMatX;
-    rotMatX = Eigen::AngleAxisd(rX, Eigen::Vector3d::UnitX());
-    Eigen::Matrix3d rotMatY;
-    rotMatY = Eigen::AngleAxisd(rY, Eigen::Vector3d::UnitY());
-    Eigen::Matrix3d rotMatZ;
-    rotMatZ = Eigen::AngleAxisd(rZ, Eigen::Vector3d::UnitZ());
-    Eigen::Matrix3d rotationMatrix = rotMatZ * rotMatY * rotMatX;
-    std::vector<Triangle> rotated_triangles = mesh.triangles;
-    for (auto& tri : rotated_triangles) {
-        tri.p1 = rotationMatrix * tri.p1;
-        tri.p2 = rotationMatrix * tri.p2;
-        tri.p3 = rotationMatrix * tri.p3;
-    }
-    return rotated_triangles;
-}
-
 void raytrace(int w, int h){
     Eigen::MatrixXd Color = Eigen::MatrixXd::Zero(w, h); 
     const double aspect_ratio = double(w) / double(h);
@@ -174,10 +140,15 @@ void raytrace(int w, int h){
     print_scene_in_ascii(Color, w, h);
 }
 
-void setup_scene(int argc, char* argv[]){
-    Mesh mesh = input_mesh(argc, argv);  
-    if (rotate) mesh.triangles = rotate_mesh(mesh, rX, rY, rZ); // Rotate mesh
-    if (!mesh.triangles.empty()) objects.emplace_back(mesh);// Add mesh to objects
+void setup_scene(int argc, char* argv[]){ 
+    load_meshes(argc,argv,meshes);
+    double rX =-.05, rY =.4, rZ =.05;//Rotation IN RADIANS
+    if(meshes.size() > 0 && rotate) meshes[0].triangles = rotate_mesh(meshes[0],rX,rY,rZ);//Rotate mesh 1
+
+    for (auto &mesh : meshes) {
+        objects.emplace_back(mesh);
+    }
+
     //Sphere example
     //Eigen::Vector3d sphere_center(0, 0, 1);               
     //objects.emplace_back(Sphere(sphere_center, 1.));            

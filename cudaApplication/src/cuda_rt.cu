@@ -65,21 +65,30 @@ __global__ void d_raytrace(
     output[idx] = fmin(brightness, 1.0);
 }
 
+std::vector<Triangle> collect_all_triangles(const std::vector<Mesh>& meshes) {
+    std::vector<Triangle> triangles;
+    for (const auto& mesh : meshes) {
+        triangles.insert(triangles.end(), mesh.triangles.begin(), mesh.triangles.end());
+    }
+    return triangles;
+}
+
 double* h_raytrace(
-    Ray* rays, Mesh mesh,
+    Ray* rays, std::vector<Mesh> meshes,
     int width, int height,
     std::vector<Eigen::Vector3d> light_positions,
     std::vector<Eigen::Vector4d> light_colors
 ) {
     int size = width * height;
-    int num_triangles = mesh.triangles.size();
     int num_lights = light_positions.size();
+
+    std::vector<Triangle> triangles = collect_all_triangles(meshes);
+    int num_triangles = triangles.size();
 
     double* h_output = new double[size];
 
     Ray* d_rays = nullptr;
     Triangle* d_triangles = nullptr;
-    std::vector<Triangle> triangles = mesh.triangles;
     double* d_output = nullptr;
     Eigen::Vector3d* d_lights = nullptr;
     Eigen::Vector4d* d_light_colors = nullptr;
@@ -100,6 +109,7 @@ double* h_raytrace(
 
     cudaMemcpy(h_output, d_output, size * sizeof(double), cudaMemcpyDeviceToHost);
 
+    // Free device memory
     cudaFree(d_rays);
     cudaFree(d_triangles);
     cudaFree(d_output);

@@ -11,7 +11,7 @@ const Eigen::Vector3d camera_position(0, 0, -100);
 
 // Rotation settings
 bool rotate = false;
-double rX =-.05, rY =.4, rZ =.05;//Rotation IN RADIANS
+
 
 // Lights
 std::vector<Eigen::Vector3d> light_positions;
@@ -20,23 +20,7 @@ std::vector<Eigen::Vector4d> light_colors;
 // Variant to store different objects
 using Intersectable = std::variant<Triangle, Sphere, Mesh>;
 std::vector<Intersectable> objects;
-
-Mesh input_mesh(int argc, char* argv[]) {
-    std::istream* input_stream = nullptr;
-    std::ifstream file_stream;
-    if (argc >= 2) {
-        std::string obj_file_path = argv[1];
-        file_stream.open(obj_file_path);
-        if (!file_stream) {
-            std::cerr << "can't open file" << std::endl;
-            throw std::runtime_error("File opening failed.");
-        }
-        input_stream = &file_stream;
-    } 
-    else input_stream = &std::cin;
-    LoadMesh m(Eigen::Matrix4d::Identity(), *input_stream);
-    return m.get_mesh();
-}
+std::vector<Mesh> meshes;
 
 Eigen::Vector3d compute_normal(const std::variant<Triangle, Sphere, Mesh> &obj, const Eigen::Vector3d &hit_point, const Triangle *hit_triangle = nullptr){
     return std::visit([&](const auto &shape) -> Eigen::Vector3d{
@@ -67,7 +51,11 @@ void print_scene_in_ascii(double* color, int w, int h) {
     }
 }
 
-void setup_scene(){ 
+void setup_scene(int argc, char* argv[]){ 
+    load_meshes(argc,argv,meshes);
+    double rX =-.05, rY =.4, rZ =.05;//Rotation IN RADIANS
+    if(meshes.size() > 0 && rotate) meshes[0].triangles = rotate_mesh(meshes[0],rX,rY,rZ);//Rotate mesh 1
+
     light_colors.emplace_back(0.8, 0.8, 0.8, 1);//Light 1
     light_positions.emplace_back(0, 5, -30);  
     light_colors.emplace_back(0.4, 0.4, 0.4, 1);//Light 2
@@ -76,23 +64,6 @@ void setup_scene(){
     light_positions.emplace_back(10, 5, 20);  
     light_colors.emplace_back(0.2, 0.2, 0.2, 1);//Light 4  
     light_positions.emplace_back(-10, 20, -30);  
-}
-
-std::vector<Triangle> rotate_mesh(Mesh& mesh, double rX, double rY, double rZ){
-    Eigen::Matrix3d rotMatX;
-    rotMatX = Eigen::AngleAxisd(rX, Eigen::Vector3d::UnitX());
-    Eigen::Matrix3d rotMatY;
-    rotMatY = Eigen::AngleAxisd(rY, Eigen::Vector3d::UnitY());
-    Eigen::Matrix3d rotMatZ;
-    rotMatZ = Eigen::AngleAxisd(rZ, Eigen::Vector3d::UnitZ());
-    Eigen::Matrix3d rotationMatrix = rotMatZ * rotMatY * rotMatX;
-    std::vector<Triangle> rotated_triangles = mesh.triangles;
-    for (auto& tri : rotated_triangles) {
-        tri.p1 = rotationMatrix * tri.p1;
-        tri.p2 = rotationMatrix * tri.p2;
-        tri.p3 = rotationMatrix * tri.p3;
-    }
-    return rotated_triangles;
 }
 
 std::vector<Ray> gen_rays(int w, int h) {
@@ -113,14 +84,11 @@ std::vector<Ray> gen_rays(int w, int h) {
     return rays;
 }
 
-int main(int argc,char* argv[]){
-    auto start=std::chrono::high_resolution_clock::now();
-    setup_scene();
-    Mesh mesh=input_mesh(argc,argv);
-    if(rotate)mesh.triangles=rotate_mesh(mesh,rX,rY,rZ);
-    double* output=h_raytrace(&gen_rays(w,h)[0],mesh,w,h,light_positions,light_colors);
+int main(int argc, char* argv[]){
+    auto start = std::chrono::high_resolution_clock::now();
+    setup_scene(argc,argv);
+    double* output = h_raytrace(&gen_rays(w,h)[0],meshes,w,h,light_positions,light_colors);
     print_scene_in_ascii(output,w,h);
-    auto end=std::chrono::high_resolution_clock::now();
-    std::cout<<"Runtime: "<<std::chrono::duration<double>(end-start).count()<<" seconds"<<std::endl;
+    std::cout << "Runtime: " << std::chrono::duration<double>(std::chrono::high_resolution_clock::now()-start).count() << " seconds" <<std::endl;
     return 0;
 }
