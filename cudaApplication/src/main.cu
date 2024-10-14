@@ -113,11 +113,15 @@ std::vector<Ray> gen_rays(int w, int h) {
     return rays;
 }
 
-int main(int argc, char* argv[]){
+#include <chrono>
+int main(int argc,char* argv[]){
+    auto start=std::chrono::high_resolution_clock::now();
     setup_scene();
-    Mesh mesh = input_mesh(argc, argv);
-    if(rotate) mesh.triangles = rotate_mesh(mesh, rX, rY, rZ);
-    double* output = h_raytrace(&gen_rays(w, h)[0], mesh, w, h, light_positions,light_colors);//Cuda Kernel
-    print_scene_in_ascii(output, w, h);
+    Mesh mesh=input_mesh(argc,argv);
+    if(rotate)mesh.triangles=rotate_mesh(mesh,rX,rY,rZ);
+    double* output=h_raytrace(&gen_rays(w,h)[0],mesh,w,h,light_positions,light_colors);
+    print_scene_in_ascii(output,w,h);
+    auto end=std::chrono::high_resolution_clock::now();
+    std::cout<<"Runtime: "<<std::chrono::duration<double>(end-start).count()<<" seconds"<<std::endl;
     return 0;
 }
