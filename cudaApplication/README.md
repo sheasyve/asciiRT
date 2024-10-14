@@ -11,5 +11,5 @@
 ```bash
 cmake ..
 make
-./ascii_rt < ../../models/toyota.obj
+./ascii_rt ../../models/toyota.obj ../../models/teapot.obj
 ```

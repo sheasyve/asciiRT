@@ -144,10 +144,9 @@ void setup_scene(int argc, char* argv[]){
     load_meshes(argc,argv,meshes);
     double rX =-.05, rY =.4, rZ =.05;//Rotation IN RADIANS
     if(meshes.size() > 0 && rotate) meshes[0].triangles = rotate_mesh(meshes[0],rX,rY,rZ);//Rotate mesh 1
+    //meshes[0].triangles = translate_mesh(meshes[0],5,5,5);//Translate mesh 1
 
-    for (auto &mesh : meshes) {
-        objects.emplace_back(mesh);
-    }
+    for (auto &mesh : meshes) objects.emplace_back(mesh);
 
     //Sphere example
     //Eigen::Vector3d sphere_center(0, 0, 1);               

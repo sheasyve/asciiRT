@@ -10,5 +10,5 @@
 
 ```bash
 sudo docker build -t cppapplication .
-sudo docker run -i -v /home/ssyverson/Documents/Code/cuda_project/models:/models cppapplication /cppapplication/build/ascii_rt /models/teapot.obj
+sudo docker run -i -v {model dir path}:/models cppapplication /cppapplication/build/ascii_rt /models/model1.obj /models/model2.obj
 ```
