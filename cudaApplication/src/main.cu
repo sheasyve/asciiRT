@@ -12,7 +12,6 @@ const Eigen::Vector3d camera_position(0, 0, -100);
 // Rotation settings
 bool rotate = false;
 
-
 // Lights
 std::vector<Eigen::Vector3d> light_positions;
 std::vector<Eigen::Vector4d> light_colors;

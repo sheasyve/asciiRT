@@ -145,12 +145,12 @@ void setup_scene(int argc, char* argv[]){
     double rX =-.05, rY =.4, rZ =.05;//Rotation IN RADIANS
     if(meshes.size() > 0 && rotate) meshes[0].triangles = rotate_mesh(meshes[0],rX,rY,rZ);//Rotate mesh 1
     //meshes[0].triangles = translate_mesh(meshes[0],5,5,5);//Translate mesh 1
-
     for (auto &mesh : meshes) objects.emplace_back(mesh);
 
     //Sphere example
     //Eigen::Vector3d sphere_center(0, 0, 1);               
-    //objects.emplace_back(Sphere(sphere_center, 1.));            
+    //objects.emplace_back(Sphere(sphere_center, 1.)); 
+               
     light_colors.emplace_back(0.8, 0.8, 0.8, 1);//Light 1
     light_positions.emplace_back(0, 5, -30);  
     light_colors.emplace_back(0.4, 0.4, 0.4, 1);//Light 2
