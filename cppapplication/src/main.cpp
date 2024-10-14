@@ -1,17 +1,48 @@
 #include "utils/main_util.hpp"
 
+// Scene settings
+int w = 112*2, h = 224*2;
+
 // Camera settings
 const double focal_length = 2.16;
 const double field_of_view = 0.7854; // 45 degrees
-const Eigen::Vector3d camera_position(0, 0, -25);
+const Eigen::Vector3d camera_position(0, 0, -100);
+
+// Rotation settings
+bool rotate = false;
+double rX =-.05, rY =.4, rZ =.05;//Rotation IN RADIANS
 
 // Lights
 std::vector<Eigen::Vector3d> light_positions;
 std::vector<Eigen::Vector4d> light_colors;
 
+// Shader settings
+double brightness = 0.005;//Start with ambient light
+double diffuse_intensity = 0.4;
+double specular_intensity = 0.4;
+double shine = 32.0;
+double a = 1., b = .1, c = .01;//Attenuation constants
+
 // Variant to store different objects
 using Intersectable = std::variant<Triangle, Sphere, Mesh>;
 std::vector<Intersectable> objects;
+
+Mesh input_mesh(int argc, char* argv[]) {
+    std::istream* input_stream = nullptr;
+    std::ifstream file_stream;
+    if (argc >= 2) {
+        std::string obj_file_path = argv[1];
+        file_stream.open(obj_file_path);
+        if (!file_stream) {
+            std::cerr << "can't open file" << std::endl;
+            throw std::runtime_error("File opening failed.");
+        }
+        input_stream = &file_stream;
+    } 
+    else input_stream = &std::cin;
+    LoadMesh m(Eigen::Matrix4d::Identity(), *input_stream);
+    return m.get_mesh();
+}
 
 Eigen::Vector3d compute_normal(const std::variant<Triangle, Sphere, Mesh> &obj, const Eigen::Vector3d &hit_point, const Triangle *hit_triangle = nullptr){
     return std::visit([&](const auto &shape) -> Eigen::Vector3d{
@@ -52,19 +83,33 @@ std::optional<std::tuple<double, Eigen::Vector3d, Intersectable, const Triangle 
     return nearest_hit;
 }
 
-Eigen::Vector3d shoot_ray(const Ray &ray){
+Eigen::Vector3d shoot_ray(const Ray &ray) {
     Eigen::Vector3d color(0., 0., 0.);
     auto nearest_hit = find_nearest_object(ray);
-    if (nearest_hit.has_value()){
+    if (nearest_hit.has_value()) {
         const auto &[t, hit_point, nearest_object, hit_triangle] = nearest_hit.value();
-        Eigen::Vector3d normal = compute_normal(nearest_object, hit_point, hit_triangle);
-        // Lighting calculations
-        for (const Eigen::Vector3d &light_pos : light_positions){
-            Eigen::Vector3d L = (light_pos - hit_point).normalized();
-            double lambertian = std::max(normal.dot(L), 0.0);
-            color += lambertian * Eigen::Vector3d(1., 1., 1.);
+        Eigen::Vector3d N = compute_normal(nearest_object, hit_point, hit_triangle);
+        N.normalize();
+        Eigen::Vector3d V = -ray.direction;
+        V.normalize();
+        for (int i = 0; i < light_positions.size(); i++) {
+            Eigen::Vector3d L = (light_positions[i] - hit_point);
+            double d = L.norm();
+            L.normalize();
+            Eigen::Vector3d light_rgb = light_colors[i].head<3>();
+            double attenuation = 1. / (a + b * d + c * d * d);
+            double lambertian = N.dot(L);
+            lambertian = fmax(lambertian, 0.0);
+            color += attenuation * diffuse_intensity * lambertian * light_rgb;
+
+            Eigen::Vector3d R = (2.0 * N.dot(L) * N - L).normalized();
+            double spec_angle = R.dot(V);
+            spec_angle = fmax(spec_angle, 0.0);
+            double specular = pow(spec_angle, shine);
+            color += attenuation * specular_intensity * specular * light_rgb;
         }
     }
+    color = color.cwiseMin(1.0);  // Limit the color values to 1.0 (per channel)
     return color;
 }
 
@@ -82,6 +127,23 @@ void print_scene_in_ascii(const Eigen::MatrixXd &Color, int w, int h) {
         }
         std::cout << std::endl;
     }
+}
+
+std::vector<Triangle> rotate_mesh(Mesh& mesh, double rX, double rY, double rZ){
+    Eigen::Matrix3d rotMatX;
+    rotMatX = Eigen::AngleAxisd(rX, Eigen::Vector3d::UnitX());
+    Eigen::Matrix3d rotMatY;
+    rotMatY = Eigen::AngleAxisd(rY, Eigen::Vector3d::UnitY());
+    Eigen::Matrix3d rotMatZ;
+    rotMatZ = Eigen::AngleAxisd(rZ, Eigen::Vector3d::UnitZ());
+    Eigen::Matrix3d rotationMatrix = rotMatZ * rotMatY * rotMatX;
+    std::vector<Triangle> rotated_triangles = mesh.triangles;
+    for (auto& tri : rotated_triangles) {
+        tri.p1 = rotationMatrix * tri.p1;
+        tri.p2 = rotationMatrix * tri.p2;
+        tri.p3 = rotationMatrix * tri.p3;
+    }
+    return rotated_triangles;
 }
 
 void raytrace(int w, int h){
@@ -108,22 +170,25 @@ void raytrace(int w, int h){
     print_scene_in_ascii(Color, w, h);
 }
 
-void setup_scene(){
-    LoadMesh m(Eigen::Matrix4d::Identity()); //Mesh
-    Mesh mesh = m.get_mesh();           
+void setup_scene(int argc, char* argv[]){
+    Mesh mesh = input_mesh(argc, argv);  
+    if (rotate) mesh.triangles = rotate_mesh(mesh, rX, rY, rZ); // Rotate mesh
     if (!mesh.triangles.empty()) objects.emplace_back(mesh);// Add mesh to objects
     //Sphere example
     //Eigen::Vector3d sphere_center(0, 0, 1);               
     //objects.emplace_back(Sphere(sphere_center, 1.));            
-    light_positions.emplace_back(8, 8, 0);  // Light position
-    light_colors.emplace_back(16, 16, 16, 0);  // Light intensity
-    light_positions.emplace_back(0, 0, 0);  // Light position
-    light_colors.emplace_back(16, 16, 16, 0);  // Light intensity
+    light_colors.emplace_back(0.8, 0.8, 0.8, 1);//Light 1
+    light_positions.emplace_back(0, 5, -30);  
+    light_colors.emplace_back(0.4, 0.4, 0.4, 1);//Light 2
+    light_positions.emplace_back(10, -5, -20);  
+    light_colors.emplace_back(0.3, 0.3, 0.3, 1);//Light 3  
+    light_positions.emplace_back(10, 5, 20);  
+    light_colors.emplace_back(0.2, 0.2, 0.2, 1);//Light 4  
+    light_positions.emplace_back(-10, 20, -30); 
 }
 
-int main(){
-    int w = 181, h = 101;
-    setup_scene();
+int main(int argc, char* argv[]){
+    setup_scene(argc,argv);
     raytrace(w, h);
     return 0;
 }

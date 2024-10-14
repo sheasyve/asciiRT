@@ -10,7 +10,7 @@
 class LoadMesh {
 public:
     std::vector<std::variant<Triangle, Sphere, Mesh>> objects;
-    LoadMesh (const Eigen::Matrix4d& transform);
+    LoadMesh(const Eigen::Matrix4d& transform, std::istream& input_stream);
     Mesh get_mesh() const;
 };
 

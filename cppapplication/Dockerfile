@@ -7,4 +7,4 @@ RUN cmake ..
 RUN make clean
 RUN make
 RUN ls -l /cppapplication/build
-CMD ["./ascii_rt"]
+CMD ["./ascii_rt"] 
