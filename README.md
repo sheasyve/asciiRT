@@ -1,4 +1,4 @@
-# AsciiRT
+# AsciiRT - Ascii based ray-tracing engine in CUDA
 ![image](https://github.com/user-attachments/assets/ab95404a-2361-4544-8f84-cb6aa4017d33)
 #### There is a c++ version and a CUDA version in respective folders.
 - *CUDA application*
