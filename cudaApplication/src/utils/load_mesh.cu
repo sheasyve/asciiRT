@@ -54,3 +54,4 @@ Mesh LoadMesh::get_mesh() const {
     }
     return Mesh(triangles); 
 }
+

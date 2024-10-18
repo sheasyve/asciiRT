@@ -1,8 +1,8 @@
 #ifndef TRIANGLE_CUH
 #define TRIANGLE_CUH
 
-#include "../utils/ray.cuh"
-#include "../utils/util.cuh"
+#include "../utils/ray.hpp"
+#include "../utils/util.hpp"
 
 class Triangle {
 public:

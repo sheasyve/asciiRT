@@ -1,7 +1,7 @@
-#ifndef RAY_CUH
-#define RAY_CUH
+#ifndef RAY_HPP
+#define RAY_HPP
 
-#include "util.cuh"
+#include "util.hpp"
 
 class Ray {
 public:
