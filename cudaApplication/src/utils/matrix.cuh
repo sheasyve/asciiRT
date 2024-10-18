@@ -1,5 +1,8 @@
-#include "util.cuh"
-#include "ray.cuh"
+#ifndef MATRIX_CUH
+#define MATRIX_CUH
+
+#include "util.hpp"
+#include "ray.hpp"
 #include "../shapes/mesh.cuh"
 #include "../shapes/triangle.cuh"
 
@@ -30,3 +33,5 @@ std::vector<Triangle> translate_mesh(Mesh& mesh, double tx, double ty, double tz
     }  
     return translated_triangles;
 }
+
+#endif // MATRIX_CUH

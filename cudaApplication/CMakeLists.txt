@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.17)
 
-project(ascii_rt LANGUAGES CUDA)
+project(ascii_rt LANGUAGES CXX CUDA)
 
 set(CMAKE_CUDA_STANDARD 20)
 set(CMAKE_CUDA_STANDARD_REQUIRED True)
@@ -13,14 +13,15 @@ include_directories("${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}")
 
 # Add executable and make sure all relevant source files are included
 add_executable(${PROJECT_NAME} 
-    src/main.cu 
-    src/utils/ray.cu 
+    src/main.cu
+    src/utils/ray.cpp 
     src/utils/load_mesh.cu 
     src/shapes/triangle.cu 
-    src/shapes/mesh.cu        # Add this line to include mesh.cpp
-    src/shapes/sphere.cu      # Add this line to include sphere.cpp
-    src/utils/intersect.cu
+    src/shapes/mesh.cu     
     src/cuda_rt.cu
+    src/utils/bvh.cu
+    src/utils/cuda_rt_util.cu
+    src/utils/ascii_print.cpp
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:

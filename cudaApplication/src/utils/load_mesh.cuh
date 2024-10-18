@@ -3,13 +3,12 @@
 #define LOAD_MESH_CUH
 
 #include "../shapes/triangle.cuh"
-#include "../shapes/sphere.cuh"
 #include "../shapes/mesh.cuh"
-#include "util.cuh"
+#include "util.hpp"
 
 class LoadMesh {
 public:
-    std::vector<std::variant<Triangle, Sphere, Mesh>> objects;
+    std::vector<std::variant<Triangle, Mesh>> objects;
     LoadMesh (const Eigen::Matrix4d& transform,std::istream& input_stream);
     Mesh get_mesh() const;
 };

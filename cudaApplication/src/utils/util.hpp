@@ -1,5 +1,5 @@
-#ifndef UTIL_CUH
-#define UTIL_CUH
+#ifndef UTIL_HPP
+#define UTIL_HPP
 
 #include <iostream>
 #include <vector>
@@ -35,6 +35,8 @@
 #define rall(v) v.rbegin(), v.rend()
 
 const double EPS = 0.00001;
+const double INF = 1e18;
+const double NINF = -1e18;
 
 using namespace Eigen;//Eigen library for linear algebra, matrix handling
 
