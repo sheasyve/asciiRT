@@ -14,7 +14,6 @@ include_directories("${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}")
 # Add executable and make sure all relevant source files are included
 add_executable(${PROJECT_NAME} 
     src/main.cu
-    src/utils/ray.cpp 
     src/utils/load_mesh.cu 
     src/shapes/triangle.cu 
     src/shapes/mesh.cu     
