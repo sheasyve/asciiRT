@@ -2,7 +2,6 @@
 #define MAIN_UTIL_CUH
 
 #include "util.hpp"
-#include "ray.hpp"
 #include "load_mesh.cuh"
 #include "matrix.cuh"
 #include "ascii_print.hpp"

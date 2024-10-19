@@ -2,7 +2,6 @@
 #define CUDA_RT_UTIL_CUH
 
 #include "util.hpp"
-#include "ray.hpp"
 #include "bvh.cuh"
 #include "../shapes/triangle.cuh"
 #include "../shapes/mesh.cuh"
@@ -16,7 +15,7 @@ __device__ bool ray_box_intersection(
 );
 
 __device__ int find_closest_triangle(
-    const Ray& r, BvhTree::Node* nodes, int root_index,
+    Vector3d& ray_origin,Vector3d& ray_direction, BvhTree::Node* nodes, int root_index,
     Triangle* triangles, double& min_t
 );
 

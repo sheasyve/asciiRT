@@ -21,19 +21,24 @@ __device__ bool ray_box_intersection(const Eigen::Vector3d& ray_origin, const Ei
     return true;
 }
 
-__device__ int find_closest_triangle(const Ray& r, BvhTree::Node* nodes, int root_index, Triangle* triangles, double& min_t) {
-    //Traverse the BVH tree to find the closest intersecting triangle
+__device__ int find_closest_triangle(
+    Eigen::Vector3d& ray_origin, Eigen::Vector3d& ray_direction, 
+    BvhTree::Node* nodes, int root_index, Triangle* triangles, double& min_t) 
+{
     int stack_index = 0;
     int min_index = -1;
     int dfs_stack[MAX_STACK_SIZE];
     dfs_stack[stack_index++] = root_index;
-    while (stack_index > 0) { // DFS traversal of the BVH tree
+    
+    while (stack_index > 0) {
         int node_index = dfs_stack[--stack_index];
         BvhTree::Node node = nodes[node_index];
-        if (ray_box_intersection(r.origin, r.direction, node.bbox)) {
+        
+        if (ray_box_intersection(ray_origin, ray_direction, node.bbox)) {
             if (node.left == -1 && node.right == -1) { // Leaf node, check for min intersection
                 int tri_idx = node.triangle;
-                double t = triangles[tri_idx].intersects(r);
+                double t = triangles[tri_idx].intersects(ray_origin, ray_direction);
+                
                 if (t > 0 && t < min_t) { // Found new closest intersecting triangle
                     min_t = t;
                     min_index = tri_idx;
@@ -45,8 +50,10 @@ __device__ int find_closest_triangle(const Ray& r, BvhTree::Node* nodes, int roo
             }
         }
     }
+    
     return min_index;
 }
+
 
 std::vector<Triangle> get_triangles(const std::vector<Mesh>& meshes) {
     //Extracts all triangles from all input meshes

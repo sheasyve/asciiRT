@@ -2,7 +2,6 @@
 #define MATRIX_CUH
 
 #include "util.hpp"
-#include "ray.hpp"
 #include "../shapes/mesh.cuh"
 #include "../shapes/triangle.cuh"
 
