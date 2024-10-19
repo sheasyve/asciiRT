@@ -15,26 +15,8 @@ bool rotate = true;
 std::vector<Eigen::Vector3d> light_positions;
 std::vector<Eigen::Vector4d> light_colors;
 
-// Variant to store different objects
-using Intersectable = std::variant<Triangle, Mesh>;
-std::vector<Intersectable> objects;
+// Meshes
 std::vector<Mesh> meshes;
-
-void setup_scene(int argc, char* argv[]){ 
-    load_meshes(argc,argv,meshes);
-    double rX =-.05, rY =.4, rZ =.05;//Rotation IN RADIANS
-    if(meshes.size() > 0 && rotate) meshes[0].triangles = rotate_mesh(meshes[0],rX,rY,rZ);//Rotate mesh 1
-    //meshes[0].triangles = translate_mesh(meshes[0],5,5,5);//Translate mesh 1
-
-    light_colors.emplace_back(0.8, 0.8, 0.8, 1);//Light 1
-    light_positions.emplace_back(0, 5, -30);  
-    light_colors.emplace_back(0.4, 0.4, 0.4, 1);//Light 2
-    light_positions.emplace_back(10, -5, -20);  
-    light_colors.emplace_back(0.3, 0.3, 0.3, 1);//Light 3  
-    light_positions.emplace_back(10, 5, 20);  
-    light_colors.emplace_back(0.2, 0.2, 0.2, 1);//Light 4  
-    light_positions.emplace_back(-10, 20, -30);  
-}
 
 void gen_rays(int w, int h, std::vector<Eigen::Vector3d>& ray_origins, std::vector<Eigen::Vector3d>& ray_directions) {
     const double aspect_ratio = double(w) / double(h);
@@ -50,6 +32,21 @@ void gen_rays(int w, int h, std::vector<Eigen::Vector3d>& ray_origins, std::vect
             ray_directions.push_back((camera_position - pixel_center).normalized());
         }
     }
+}
+
+void setup_scene(int argc, char* argv[]){ 
+    load_meshes(argc,argv,meshes);
+    double rX =-.05, rY =.4, rZ =.05;//Rotation IN RADIANS
+    if(meshes.size() > 0 && rotate) meshes[0].triangles = rotate_mesh(meshes[0],rX,rY,rZ);//Rotate mesh 1
+    //meshes[0].triangles = translate_mesh(meshes[0],5,5,5);//Translate mesh 1
+    light_colors.emplace_back(0.8, 0.8, 0.8, 1);//Light 1
+    light_positions.emplace_back(0, 5, -30);  
+    light_colors.emplace_back(0.4, 0.4, 0.4, 1);//Light 2
+    light_positions.emplace_back(10, -5, -20);  
+    light_colors.emplace_back(0.3, 0.3, 0.3, 1);//Light 3  
+    light_positions.emplace_back(10, 5, 20);  
+    light_colors.emplace_back(0.2, 0.2, 0.2, 1);//Light 4  
+    light_positions.emplace_back(-10, 20, -30);  
 }
 
 int main(int argc, char* argv[]){
