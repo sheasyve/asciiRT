@@ -18,6 +18,8 @@ add_executable(${PROJECT_NAME}
     src/utils/bvh.cu
     src/utils/cuda_rt_util.cu
     src/utils/ascii_print.cpp
+    src/utils/main_util.cu
+    src/utils/matrix_util.cu
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE 

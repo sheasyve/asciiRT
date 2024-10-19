@@ -1,9 +1,4 @@
-#ifndef MATRIX_CUH
-#define MATRIX_CUH
-
-#include "util.hpp"
-#include "../shapes/mesh.cuh"
-#include "../shapes/triangle.cuh"
+#include "matrix_util.cuh"
 
 std::vector<Triangle> rotate_mesh(Mesh& mesh, double rX, double rY, double rZ){
     Eigen::Matrix3d rotMatX;
@@ -32,5 +27,3 @@ std::vector<Triangle> translate_mesh(Mesh& mesh, double tx, double ty, double tz
     }  
     return translated_triangles;
 }
-
-#endif // MATRIX_CUH

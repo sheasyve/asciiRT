@@ -1,13 +1,4 @@
-#ifndef MAIN_UTIL_CUH
-#define MAIN_UTIL_CUH
-
-#include "util.hpp"
-#include "load_mesh.cuh"
-#include "matrix.cuh"
-#include "ascii_print.hpp"
-#include "../cuda_rt.cuh"
-#include "../shapes/triangle.cuh"
-#include "../shapes/mesh.cuh"
+#include "main_util.cuh"
 
 Mesh input_mesh(const std::string& filename) {
     std::ifstream file_stream;
@@ -23,5 +14,3 @@ Mesh input_mesh(const std::string& filename) {
 void load_meshes(int argc, char* argv[], std::vector<Mesh>& meshes) {
     for (int i = 1; i < argc; ++i) meshes.push_back(input_mesh(argv[i]));//Load a single mesh with the load mesh class
 }
-
-#endif //MAIN_UTIL_HPP
