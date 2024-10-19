@@ -43,4 +43,5 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     CUDA_SEPARABLE_COMPILATION ON
 )
 
-target_link_libraries(${PROJECT_NAME} Eigen3::Eigen cuda)
+target_link_libraries(${PROJECT_NAME} Eigen3::Eigen)
+target_link_libraries(${PROJECT_NAME} ${CUDA_LIBRARIES} cuda)
