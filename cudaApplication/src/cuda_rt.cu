@@ -11,30 +11,25 @@ __global__ void d_raytrace(
     int x = blockIdx.x * blockDim.x + threadIdx.x;
     int y = blockIdx.y * blockDim.y + threadIdx.y;
     if (x >= width || y >= height) return;
-
     int idx = y * width + x;
+    //Ray setup and intersect
     Eigen::Vector3d origin = ray_origins[idx];
     Eigen::Vector3d direction = ray_directions[idx];
     double min_t = INF;
     int mindex = find_closest_triangle(origin, direction, nodes, root_index, triangles, min_t);
-
-    if (mindex == -1) {
-        output[idx] = 0.0;
-        return;
-    }
-
+    if (mindex == -1) {output[idx] = 0.0;return;}
+    //Shading calculations
     Eigen::Vector3d p = origin + direction * min_t;
     Triangle closest = triangles[mindex];
     Eigen::Vector3d N = closest.normal();
     N.normalize();
     Eigen::Vector3d V = -direction;
     V.normalize();
-
+    //Phong shading params
     double brightness = 0.005;
     double diffuse_intensity = 0.4;
     double specular_intensity = 0.4;
     double shine = 32.0;
-
     for (int i = 0; i < num_lights; i++) {
         Eigen::Vector3d L = (light_positions[i] - p);
         double d = L.norm();
