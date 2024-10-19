@@ -8,57 +8,66 @@ __global__ void d_raytrace(
     Eigen::Vector3d* light_positions,
     Eigen::Vector4d* light_colors, int num_lights
 ) {
+    //Ray init
     int x = blockIdx.x * blockDim.x + threadIdx.x;
     int y = blockIdx.y * blockDim.y + threadIdx.y;
     if (x >= width || y >= height) return;
     int idx = y * width + x;
-    // Ray setup and intersection
     Eigen::Vector3d origin = ray_origins[idx];
     Eigen::Vector3d direction = ray_directions[idx];
-    double min_t = INF;
-    int mindex = find_closest_triangle(origin, direction, nodes, root_index, triangles, min_t);
-    if (mindex == -1) {
-        output[idx] = 0.0;
-        return;
-    }
-    // Shading calculations
-    Eigen::Vector3d p = origin + direction * min_t;
-    Triangle closest = triangles[mindex];
-    Eigen::Vector3d N = closest.normal();
-    N.normalize();
-    Eigen::Vector3d V = -direction;
-    V.normalize();
+    //Perform RT
     // Phong shading parameters
-    double brightness = 0.005;
     double diffuse_intensity = 0.4;
     double specular_intensity = 0.4;
+    double reflection_coefficient = 0.5; 
     double shine = 32.0;
-    // Constants for attenuation calculation
     double a = 1.0, b = 0.1, c = 0.01;
-    for (int i = 0; i < num_lights; i++) {
-        Eigen::Vector3d L = light_positions[i] - p;
-        double d = L.norm();
-        L.normalize();
-        // Shadow ray setup
-        Eigen::Vector3d shadow_ray_origin = p + N * 1e-4; 
-        double shadow_ray_t = d; // Maximum distance to check (distance to light)
-        int shadow_mindex = find_closest_triangle(shadow_ray_origin, L, nodes, root_index, triangles, shadow_ray_t);
-        bool in_shadow = (shadow_mindex != -1 && shadow_ray_t > 0.0);
-        double attenuation = in_shadow ? 0.0 : (1.0 / (a + b * d + c * d * d));//Apply shadow and attenuation
-        Eigen::Vector3d light_rgb = light_colors[i].head<3>();
-        // Diffuse component
-        double lambertian = fmax(N.dot(L), 0.0);
-        brightness += attenuation * diffuse_intensity * lambertian * light_rgb.norm();
-        // Specular component
-        Eigen::Vector3d R = (2.0 * N.dot(L) * N - L).normalized();
-        double spec_angle = fmax(R.dot(V), 0.0);
-        double specular = pow(spec_angle, shine);
-        brightness += attenuation * specular_intensity * specular * light_rgb.norm();
+    double brightness = 0.0;
+    
+    int max_depth = 3; //Max reflections
+    for (int depth = 0; depth < max_depth; depth++) { //For each reflection
+        double local_brightness = 0.005, min_t = INF;
+        int mindex = find_closest_triangle(origin, direction, nodes, root_index, triangles, min_t);
+        if (mindex == -1) {
+            brightness += 0.0;
+            break;
+        }
+        // Compute intersection point and normal
+        Eigen::Vector3d p = origin + direction * min_t;
+        Triangle closest = triangles[mindex];
+        Eigen::Vector3d N = closest.normal();
+        N.normalize();
+        Eigen::Vector3d V = -direction;
+        V.normalize();
+        for (int i = 0; i < num_lights; i++) {//For each light
+            Eigen::Vector3d L = light_positions[i] - p;
+            double d = L.norm();
+            L.normalize();
+            //Shadow ray cast
+            Eigen::Vector3d shadow_ray_origin = p + N * 1e-4;
+            double shadow_ray_t = d; // Maximum distance to check (distance to light)
+            int shadow_mindex = find_closest_triangle(shadow_ray_origin, L, nodes, root_index, triangles, shadow_ray_t);
+            bool in_shadow = (shadow_mindex != -1 && shadow_ray_t > 0.0);
+            double attenuation = in_shadow ? 0.0 : (1.0 / (a + b * d + c * d * d));
+            Eigen::Vector3d light_rgb = light_colors[i].head<3>();
+            // Diffuse
+            double lambertian = fmax(N.dot(L), 0.0);
+            local_brightness += attenuation * diffuse_intensity * lambertian * light_rgb.norm();
+            // Specular
+            Eigen::Vector3d R = (2.0 * N.dot(L) * N - L).normalized();
+            double spec_angle = fmax(R.dot(V), 0.0);
+            double specular = pow(spec_angle, shine);
+            local_brightness += attenuation * specular_intensity * specular * light_rgb.norm();
+        }
+        local_brightness = fmin(local_brightness, 1.0);
+        brightness += pow(reflection_coefficient, depth) * local_brightness;
+        direction = direction - 2.0 * direction.dot(N) * N;//Calculate new ray direction from reflection
+        direction.normalize();
+        origin = p + direction * 1e-4;
     }
-    brightness = fmin(brightness, 1.0);
+
     output[idx] = brightness;
 }
-
 
 double* h_raytrace(
     std::vector<Eigen::Vector3d> ray_origins,
