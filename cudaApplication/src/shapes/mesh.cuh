@@ -5,7 +5,6 @@
 #include <optional>
 #include <tuple>
 #include "triangle.cuh"
-#include "../utils/ray.hpp"
 
 class Mesh {
 public:

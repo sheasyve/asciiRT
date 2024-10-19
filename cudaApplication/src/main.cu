@@ -36,8 +36,7 @@ void setup_scene(int argc, char* argv[]){
     light_positions.emplace_back(-10, 20, -30);  
 }
 
-std::vector<Ray> gen_rays(int w, int h) {
-    std::vector<Ray> rays;
+void gen_rays(int w, int h,std::vector<Eigen::Vector3d>& ray_origins, std::vector<Eigen::Vector3d>& ray_directions) {
     const double aspect_ratio = double(w) / double(h);
     const double y = (((focal_length)*sin(field_of_view / 2)) / sin((180 - (90 + ((field_of_view * (180 / M_PI) / 2)))) * (M_PI / 180)));
     const double x = (y * aspect_ratio);
@@ -47,17 +46,18 @@ std::vector<Ray> gen_rays(int w, int h) {
     for (int j = 0; j < h; j++) {
         for (int i = 0; i < w; i++) {
             Eigen::Vector3d pixel_center = image_origin + (i + 0.5) * x_displacement + (j + 0.5) * y_displacement;
-            Ray r(camera_position, (camera_position - pixel_center).normalized());
-            rays.push_back(r);
+            ray_origins.push_back(camera_position);
+            ray_directions.push_back((camera_position - pixel_center).normalized());
         }
     }
-    return rays;
 }
 
 int main(int argc, char* argv[]){
     auto start = std::chrono::high_resolution_clock::now();
+    std::vector<Eigen::Vector3d> ray_origins, ray_directions;
+    gen_rays(w,h,ray_origins,ray_directions);
     setup_scene(argc,argv);
-    double* output = h_raytrace(&gen_rays(w,h)[0],meshes,w,h,light_positions,light_colors);
+    double* output = h_raytrace(ray_origins,ray_directions,meshes,w,h,light_positions,light_colors);
     print_scene_in_ascii(output,w,h);
     std::cout << "Runtime: " << std::chrono::duration<double>(std::chrono::high_resolution_clock::now()-start).count() << " seconds" <<std::endl;
     return 0;
