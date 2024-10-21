@@ -2,3 +2,6 @@
 **/.vscode
 models/*
 !models/.gitkeep
+!citations.md
+!cannon.obj
+!pirateship.obj
