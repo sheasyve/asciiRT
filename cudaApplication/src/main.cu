@@ -1,7 +1,7 @@
 #include "utils/main_util.cuh"
 
 // Scene settings
-int w = 112*2, h = 224*2;
+int w = 224, h = 224;
 
 // Camera settings
 const double focal_length = 2.16;
@@ -36,7 +36,7 @@ void gen_rays(int w, int h, std::vector<Eigen::Vector3d>& ray_origins, std::vect
 
 void setup_scene(int argc, char* argv[]){ 
     load_meshes(argc,argv,meshes);
-    double rX =-.05, rY =.4, rZ =.05;//Rotation IN RADIANS
+    double rX =-.05, rY =.8, rZ =.05;//Rotation IN RADIANS
     if(meshes.size() > 0 && rotate) meshes[0].triangles = rotate_mesh(meshes[0],rX,rY,rZ);//Rotate mesh 1
     //meshes[0].triangles = translate_mesh(meshes[0],5,5,5);//Translate mesh 1
     light_colors.emplace_back(0.8, 0.8, 0.8, 1);//Light 1
