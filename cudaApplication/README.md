@@ -1,4 +1,4 @@
-# cuda_project c++ implementation
+# cuda_project cuda implementation
 
 ## Steps to build and run
 
