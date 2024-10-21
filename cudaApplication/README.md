@@ -1,15 +1,11 @@
-# cuda_project cuda implementation
+# CUDA implementation
 
 ## Steps to build and run
-
-### Install docker
-
-<https://docs.docker.com/desktop/>
 
 ### Run commands in the build directory
 
 ```bash
 cmake ..
 make
-./ascii_rt ../../models/toyota.obj ../../models/teapot.obj
+./ascii_rt ../../models/pirateship.obj
 ```
