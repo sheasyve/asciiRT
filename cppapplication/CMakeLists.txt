@@ -16,12 +16,14 @@ include_directories("/usr/include/eigen3")
 # Add executable and make sure all relevant source files are included
 add_executable(${PROJECT_NAME} 
     src/main.cpp 
-    src/utils/ray.cpp 
+    src/utils/bvh.cpp 
+    src/utils/ascii_print.cpp 
+    src/utils/main_util.cpp 
+    src/utils/matrix_util.cpp 
     src/utils/load_mesh.cpp 
     src/shapes/triangle.cpp 
-    src/shapes/mesh.cpp        # Add this line to include mesh.cpp
-    src/shapes/sphere.cpp      # Add this line to include sphere.cpp
-    src/utils/intersect.cpp
+    src/shapes/mesh.cpp
+    src/utils/rt_util.cpp        
 )
 
 target_link_libraries(${PROJECT_NAME} Eigen3::Eigen)
