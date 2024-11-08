@@ -136,12 +136,10 @@ int main(int argc, char* argv[]){
     std::vector<Eigen::Vector3f> ray_origins, ray_directions;
     setup_scene(argc,argv);
     float* output = new float[w * h];
-
     gen_rays(w, h, ray_origins, ray_directions, output);
     print_scene_in_ascii(output, w, h);
     auto end=std::chrono::high_resolution_clock::now();
     std::cout<<"Runtime: "<<std::chrono::duration<float>(end-start).count()<<" seconds"<<std::endl;
     delete[] output;
-
     return 0;
 }

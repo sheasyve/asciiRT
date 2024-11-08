@@ -22,22 +22,18 @@ bool ray_box_intersection(const Eigen::Vector3f& ray_origin, const Eigen::Vector
 }
 
 int find_closest_triangle(Eigen::Vector3f& ray_origin, Eigen::Vector3f& ray_direction, 
-    std::vector<BvhTree::Node>& nodes, int root_index, std::vector<Triangle> triangles, float& min_t) 
-{
+    std::vector<BvhTree::Node>& nodes, int root_index, std::vector<Triangle> triangles, float& min_t) {
     int stack_index = 0;
     int min_index = -1;
     int dfs_stack[MAX_STACK_SIZE];
     dfs_stack[stack_index++] = root_index;
-    
     while (stack_index > 0) {
         int node_index = dfs_stack[--stack_index];
         BvhTree::Node node = nodes[node_index];
-        
         if (ray_box_intersection(ray_origin, ray_direction, node.bbox)) {
             if (node.left == -1 && node.right == -1) { // Leaf node, check for min intersection
                 int tri_idx = node.triangle;
                 float t = triangles[tri_idx].intersects(ray_origin, ray_direction);
-                
                 if (t > 0 && t < min_t) { // Found new closest intersecting triangle
                     min_t = t;
                     min_index = tri_idx;
@@ -51,7 +47,6 @@ int find_closest_triangle(Eigen::Vector3f& ray_origin, Eigen::Vector3f& ray_dire
     }
     return min_index;
 }
-
 
 std::vector<Triangle> get_triangles(const std::vector<Mesh>& meshes) {
     //Extracts all triangles from all input meshes
