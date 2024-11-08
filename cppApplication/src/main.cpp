@@ -42,8 +42,6 @@ void d_raytrace(
     float diffuse_intensity = 0.4;
     float specular_intensity = 0.4;
     float reflection_coefficient = 0.5; 
-    float shine = 32.0;
-    float a = 1.0, b = 0.1, c = 0.01;
     float brightness = 0.0;
     int max_depth = 3; //Max reflections
     for (int depth = 0; depth < max_depth; depth++) {//Perform RT up to depth times for each reflection
