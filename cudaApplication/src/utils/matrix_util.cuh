@@ -5,7 +5,7 @@
 #include "../shapes/mesh.cuh"
 #include "../shapes/triangle.cuh"
 
-std::vector<Triangle> rotate_mesh(Mesh& mesh, double rX, double rY, double rZ);
-std::vector<Triangle> translate_mesh(Mesh& mesh, double tx, double ty, double tz);
+std::vector<Triangle> rotate_mesh(Mesh& mesh, float rX, float rY, float rZ);
+std::vector<Triangle> translate_mesh(Mesh& mesh, float tx, float ty, float tz);
 
 #endif // MATRIX_CUH
