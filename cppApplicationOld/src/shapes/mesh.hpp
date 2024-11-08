@@ -11,7 +11,7 @@ class Mesh {
 public:
     std::vector<Triangle> triangles;
     Mesh(const std::vector<Triangle>& tris);
-    std::optional<std::tuple<double, Eigen::Vector3d, const Triangle*>> intersects(const Ray& ray) const;
+    std::optional<std::tuple<float, Eigen::Vector3f, const Triangle*>> intersects(const Ray& ray) const;
 };
 
 #endif

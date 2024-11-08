@@ -10,9 +10,9 @@
 class Intersect {
 public:
     Intersect(const Ray& ray);
-    std::optional<std::tuple<double, Eigen::Vector3d>> operator()(const Triangle& triangle) const;
-    std::optional<std::tuple<double, Eigen::Vector3d>> operator()(const Sphere& sphere) const;
-    std::optional<std::tuple<double, Eigen::Vector3d>> operator()(const Mesh& mesh) const;
+    std::optional<std::tuple<float, Eigen::Vector3f>> operator()(const Triangle& triangle) const;
+    std::optional<std::tuple<float, Eigen::Vector3f>> operator()(const Sphere& sphere) const;
+    std::optional<std::tuple<float, Eigen::Vector3f>> operator()(const Mesh& mesh) const;
 
 private:
     const Ray& ray;
