@@ -1,8 +1,8 @@
 // obj.cpp
 #include "load_mesh.hpp"
 
-LoadMesh::LoadMesh(const Eigen::Matrix4d& transform, std::istream& input_stream) {
-    std::vector<Eigen::Vector4d> points;
+LoadMesh::LoadMesh(const Eigen::Matrix4f& transform, std::istream& input_stream) {
+    std::vector<Eigen::Vector4f> points;
     
     for (std::string line; std::getline(input_stream, line);) {
         std::stringstream line_stream(line);
@@ -10,9 +10,9 @@ LoadMesh::LoadMesh(const Eigen::Matrix4d& transform, std::istream& input_stream)
         line_stream >> prefix;
 
         if (prefix == "v") {//Read vertice
-            double x, y, z;
+            float x, y, z;
             line_stream >> x >> y >> z;
-            points.push_back(transform * Eigen::Vector4d(x, y, z, 1.0));
+            points.push_back(transform * Eigen::Vector4f(x, y, z, 1.0));
 
         } else if (prefix == "f") {//Read face
             std::vector<int> vertex_indices;
@@ -45,8 +45,7 @@ LoadMesh::LoadMesh(const Eigen::Matrix4d& transform, std::istream& input_stream)
     }
 }
 
-
-Mesh LoadMesh::get_mesh() const {//Return triangles from mesh
+Mesh LoadMesh::get_mesh() const {
     std::vector<Triangle> triangles;
     for (const auto& object : objects) {
         if (std::holds_alternative<Triangle>(object)) {
@@ -55,3 +54,4 @@ Mesh LoadMesh::get_mesh() const {//Return triangles from mesh
     }
     return Mesh(triangles); 
 }
+

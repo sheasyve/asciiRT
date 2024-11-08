@@ -1,4 +1,4 @@
-#include "matrix_util.cuh"
+#include "matrix_util.hpp"
 
 std::vector<Triangle> rotate_mesh(Mesh& mesh, float rX, float rY, float rZ){
     Eigen::Matrix3f rotMatX;
