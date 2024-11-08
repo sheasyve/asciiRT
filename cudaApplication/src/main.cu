@@ -40,7 +40,7 @@ void gen_rays(int w, int h, std::vector<Eigen::Vector3f> &ray_origins, std::vect
 void setup_scene(int argc, char *argv[])
 {
     load_meshes(argc, argv, meshes);
-    float rX = -.05, rY = .8, rZ = .05; // Rotation IN RADIANS
+    float rX = -.05, rY = .4, rZ = .05; // Rotation IN RADIANS
     if (meshes.size() > 0 && rotate)
         meshes[0].triangles = rotate_mesh(meshes[0], rX, rY, rZ); // Rotate mesh 1
     // meshes[0].triangles = translate_mesh(meshes[0],5,5,5);//Translate mesh 1

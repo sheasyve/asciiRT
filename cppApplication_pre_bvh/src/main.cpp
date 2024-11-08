@@ -9,7 +9,7 @@ const double field_of_view = 0.7854; // 45 degrees
 const Eigen::Vector3d camera_position(0, 0, -100);
 
 // Rotation settings
-bool rotate = false;
+bool rotate = true;
 double rX =-.05, rY =.4, rZ =.05;//Rotation IN RADIANS
 
 // Lights

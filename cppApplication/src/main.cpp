@@ -9,7 +9,7 @@ const float field_of_view = 0.7854; // 45 degrees
 const Eigen::Vector3f camera_position(0, 0, -100);
 
 // Rotation settings
-bool rotate = false;
+bool rotate = true;
 float rX =-.05, rY =.4, rZ =.05;//Rotation IN RADIANS
 
 // Lights
@@ -20,9 +20,11 @@ int num_lights = 4;
 // Shader settings
 const float diffuse_intensity = 0.4;
 const float specular_intensity = 0.4;
+const float reflection_coefficient = 0.5; 
 const float ambient_light = 0.005;
 const float shine = 32.0;
 const float a = 1., b = .1, c = .01;//Attenuation constants
+int max_depth = 3; //Max reflections
 
 // Variant to store different objects
 std::vector<Mesh> meshes;
@@ -39,11 +41,7 @@ void d_raytrace(
     Eigen::Vector3f origin = ray_origin;
     Eigen::Vector3f direction = ray_direction;
     // Phong shading parameters
-    float diffuse_intensity = 0.4;
-    float specular_intensity = 0.4;
-    float reflection_coefficient = 0.5; 
     float brightness = 0.0;
-    int max_depth = 3; //Max reflections
     for (int depth = 0; depth < max_depth; depth++) {//Perform RT up to depth times for each reflection
         float local_brightness = 0.005, min_t = INF;
         int mindex = find_closest_triangle(origin, direction, nodes, root_index, triangles, min_t);
