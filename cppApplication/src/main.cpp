@@ -1,7 +1,7 @@
 #include "utils/main_util.hpp"
 
 // Scene settings
-int w = 112*2, h = 224*2;
+int w = 224, h = 224*2;
 
 // Camera settings
 const float focal_length = 2.16;

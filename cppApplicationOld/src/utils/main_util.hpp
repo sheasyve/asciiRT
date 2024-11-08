@@ -10,7 +10,7 @@
 #include "../shapes/sphere.hpp"
 #include "../shapes/mesh.hpp"
 
-std::pair<int, int> find_boundary(const Eigen::MatrixXd &Color, int w, int h) {
+std::pair<int, int> find_boundary(const Eigen::MatrixXf &Color, int w, int h) {
     int first_line = -1,last_line = -1;
     for (int j = h - 1; j >= 0; --j) {
         for (int i = 0; i < w; ++i) {
@@ -34,7 +34,7 @@ Mesh input_mesh(const std::string& filename) {
         throw std::runtime_error("File opening failed.");
     }
 
-    LoadMesh m(Eigen::Matrix4d::Identity(), file_stream);
+    LoadMesh m(Eigen::Matrix4f::Identity(), file_stream);
     return m.get_mesh();
 }
 

@@ -1,7 +1,7 @@
 #include "utils/main_util.cuh"
 
 // Scene settings
-int w = 180, h = 180;
+int w = 224, h = 224*2;
 
 // Camera settings
 const float focal_length = 2.16;
