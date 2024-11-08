@@ -7,7 +7,7 @@ Mesh input_mesh(const std::string& filename) {
         std::cerr << "Can't open file: " << filename << std::endl;
         throw std::runtime_error("File opening failed.");
     }
-    LoadMesh m(Eigen::Matrix4d::Identity(), file_stream);
+    LoadMesh m(Eigen::Matrix4f::Identity(), file_stream);
     return m.get_mesh();
 }
 

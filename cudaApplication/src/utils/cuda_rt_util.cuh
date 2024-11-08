@@ -9,14 +9,14 @@
 const int MAX_STACK_SIZE = 64;
 
 __device__ bool ray_box_intersection(
-    const Eigen::Vector3d& ray_origin,
-    const Eigen::Vector3d& ray_direction,
-    const AlignedBox3d& bbox
+    const Eigen::Vector3f& ray_origin,
+    const Eigen::Vector3f& ray_direction,
+    const AlignedBox3f& bbox
 );
 
 __device__ int find_closest_triangle(
-    Vector3d& ray_origin,Vector3d& ray_direction, BvhTree::Node* nodes, int root_index,
-    Triangle* triangles, double& min_t
+    Vector3f& ray_origin,Vector3f& ray_direction, BvhTree::Node* nodes, int root_index,
+    Triangle* triangles, float& min_t
 );
 
 std::vector<Triangle> get_triangles(const std::vector<Mesh>& meshes);

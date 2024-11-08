@@ -12,7 +12,7 @@ public:
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-        AlignedBox3d bbox;
+        AlignedBox3f bbox;
         int parent;   
         int left;    
         int right;    
@@ -22,7 +22,7 @@ public:
     };
 
     struct triangle_centroid {
-        Eigen::Vector3d centroid;
+        Eigen::Vector3f centroid;
         int index = 0;
     };
 
@@ -31,8 +31,8 @@ public:
 
     BvhTree() = default;
     BvhTree(const std::vector<Triangle>& triangles);
-    std::vector<int> sort_triangles(const std::vector<Eigen::Vector3d>& centroids);
-    void get_longest_axis(const std::vector<Eigen::Vector3d>& centroids);
+    std::vector<int> sort_triangles(const std::vector<Eigen::Vector3f>& centroids);
+    void get_longest_axis(const std::vector<Eigen::Vector3f>& centroids);
     int build_tree(const std::vector<int>& indexes, const std::vector<Triangle>& triangles);
     
     int longest_axis = 0;

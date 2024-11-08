@@ -1,14 +1,14 @@
 #include "cuda_rt_util.cuh"
 
-__device__ bool ray_box_intersection(const Eigen::Vector3d& ray_origin, const Eigen::Vector3d& ray_direction, const AlignedBox3d& bbox) {
+__device__ bool ray_box_intersection(const Eigen::Vector3f& ray_origin, const Eigen::Vector3f& ray_direction, const AlignedBox3f& bbox) {
     //Intersection of ray and axis-aligned bounding box
-    double tmin = NINF, tmax = INF;
+    float tmin = NINF, tmax = INF;
     for (int i = 0; i < 3; ++i) {
-        double invD = 1.0 / ray_direction[i];
-        double t0 = (bbox.min()[i] - ray_origin[i]) * invD;
-        double t1 = (bbox.max()[i] - ray_origin[i]) * invD;
+        float invD = 1.0 / ray_direction[i];
+        float t0 = (bbox.min()[i] - ray_origin[i]) * invD;
+        float t1 = (bbox.max()[i] - ray_origin[i]) * invD;
         if (invD < 0.0) {// Swap t0 and t1
-            double temp = t0;
+            float temp = t0;
             t0 = t1;
             t1 = temp;
         }
@@ -22,8 +22,8 @@ __device__ bool ray_box_intersection(const Eigen::Vector3d& ray_origin, const Ei
 }
 
 __device__ int find_closest_triangle(
-    Eigen::Vector3d& ray_origin, Eigen::Vector3d& ray_direction, 
-    BvhTree::Node* nodes, int root_index, Triangle* triangles, double& min_t) 
+    Eigen::Vector3f& ray_origin, Eigen::Vector3f& ray_direction, 
+    BvhTree::Node* nodes, int root_index, Triangle* triangles, float& min_t) 
 {
     int stack_index = 0;
     int min_index = -1;
@@ -37,7 +37,7 @@ __device__ int find_closest_triangle(
         if (ray_box_intersection(ray_origin, ray_direction, node.bbox)) {
             if (node.left == -1 && node.right == -1) { // Leaf node, check for min intersection
                 int tri_idx = node.triangle;
-                double t = triangles[tri_idx].intersects(ray_origin, ray_direction);
+                float t = triangles[tri_idx].intersects(ray_origin, ray_direction);
                 
                 if (t > 0 && t < min_t) { // Found new closest intersecting triangle
                     min_t = t;
@@ -50,7 +50,6 @@ __device__ int find_closest_triangle(
             }
         }
     }
-    
     return min_index;
 }
 

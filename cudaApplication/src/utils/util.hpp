@@ -34,9 +34,9 @@
 #define all(x) (x).begin(), (x).end()
 #define rall(v) v.rbegin(), v.rend()
 
-const double EPS = 0.00001;
-const double INF = 1e18;
-const double NINF = -1e18;
+const float EPS = 0.00001;
+const float INF = 1e18;
+const float NINF = -1e18;
 
 using namespace Eigen;//Eigen library for linear algebra, matrix handling
 

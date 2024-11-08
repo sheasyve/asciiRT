@@ -1,6 +1,6 @@
 #include "ascii_print.hpp"
 
-std::pair<int, int> find_boundary(double* color, int w, int h) {
+std::pair<int, int> find_boundary(float* color, int w, int h) {
     //Find the first and last non-empty lines to print without extra whitespace
     int first_line = -1,last_line = -1;
     for (int j = h - 1; j >= 0; --j) {
@@ -17,7 +17,7 @@ std::pair<int, int> find_boundary(double* color, int w, int h) {
     return {first_line, last_line}; 
 }
 
-void print_scene_in_ascii(double* color, int w, int h) {
+void print_scene_in_ascii(float* color, int w, int h) {
     // ASCII characters for brightness levels
     const std::string brightness_chars = " `.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@";
     const int l = brightness_chars.size() - 1;
