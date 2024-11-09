@@ -1,0 +1,106 @@
+[21621] ascii_rt@127.0.0.1
+  d_raytrace(Matrix<float, 3, 1, 0, 3, 1> *, Matrix<float, 3, 1, 0, 3, 1> *, Node *, int, Triangle *, float *, int, int, Matrix<float, 3, 1, 0, 3, 1> *, Matrix<float, 4, 1, 0, 4, 1> *, int) (14, 28, 1)x(16, 16, 1), Context 1, Stream 7, Device 0, CC 8.6
+    Section: GPU Speed Of Light Throughput
+    ----------------------- ----------- -------------
+    Metric Name             Metric Unit  Metric Value
+    ----------------------- ----------- -------------
+    DRAM Frequency                  Ghz          6.99
+    SM Frequency                    Ghz          1.50
+    Elapsed Cycles                cycle   505,957,685
+    Memory Throughput                 %          2.29
+    DRAM Throughput                   %          0.56
+    Duration                         ms        337.31
+    L1/TEX Cache Throughput           %          9.30
+    L2 Cache Throughput               %          0.75
+    SM Active Cycles              cycle 53,534,524.22
+    Compute (SM) Throughput           %         17.44
+    ----------------------- ----------- -------------
+
+    OPT   This kernel exhibits low compute throughput and memory bandwidth utilization relative to the peak performance 
+          of this device. Achieved compute throughput and/or memory bandwidth below 60.0% of peak typically indicate    
+          latency issues. Look at Scheduler Statistics and Warp State Statistics for potential reasons.                 
+
+    Section: Launch Statistics
+    -------------------------------- --------------- ---------------
+    Metric Name                          Metric Unit    Metric Value
+    -------------------------------- --------------- ---------------
+    Block Size                                                   256
+    Function Cache Configuration                     CachePreferNone
+    Grid Size                                                    392
+    Registers Per Thread             register/thread              75
+    Shared Memory Configuration Size           Kbyte            8.19
+    Driver Shared Memory Per Block       Kbyte/block            1.02
+    Dynamic Shared Memory Per Block       byte/block               0
+    Static Shared Memory Per Block        byte/block               0
+    # SMs                                         SM              46
+    Threads                                   thread         100,352
+    Uses Green Context                                             0
+    Waves Per SM                                                2.84
+    -------------------------------- --------------- ---------------
+
+    OPT   Est. Speedup: 33.33%                                                                                          
+          A wave of thread blocks is defined as the maximum number of blocks that can be executed in parallel on the    
+          target GPU. The number of blocks in a wave depends on the number of multiprocessors and the theoretical       
+          occupancy of the kernel. This kernel launch results in 2 full waves and a partial wave of 116 thread blocks.  
+          Under the assumption of a uniform execution duration of all thread blocks, the partial wave may account for   
+          up to 33.3% of the total kernel runtime with a lower occupancy of 70.8%. Try launching a grid with no         
+          partial wave. The overall impact of this tail effect also lessens with the number of full waves executed for  
+          a grid. See the Hardware Model                                                                                
+          (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#metrics-hw-model) description for more      
+          details on launch configurations.                                                                             
+
+    Section: Occupancy
+    ------------------------------- ----------- ------------
+    Metric Name                     Metric Unit Metric Value
+    ------------------------------- ----------- ------------
+    Block Limit SM                        block           16
+    Block Limit Registers                 block            3
+    Block Limit Shared Mem                block            8
+    Block Limit Warps                     block            6
+    Theoretical Active Warps per SM        warp           24
+    Theoretical Occupancy                     %           50
+    Achieved Occupancy                        %        14.61
+    Achieved Active Warps Per SM           warp         7.01
+    ------------------------------- ----------- ------------
+
+    OPT   Est. Local Speedup: 70.78%                                                                                    
+          The difference between calculated theoretical (50.0%) and measured achieved occupancy (14.6%) can be the      
+          result of warp scheduling overheads or workload imbalances during the kernel execution. Load imbalances can   
+          occur between warps within a block as well as across blocks of the same kernel. See the CUDA Best Practices   
+          Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#occupancy) for more details on     
+          optimizing occupancy.                                                                                         
+    ----- --------------------------------------------------------------------------------------------------------------
+    OPT   Est. Local Speedup: 50%                                                                                       
+          The 6.00 theoretical warps per scheduler this kernel can issue according to its occupancy are below the       
+          hardware maximum of 12. This kernel's theoretical occupancy (50.0%) is limited by the number of required      
+          registers.                                                                                                    
+
+    Section: GPU and Memory Workload Distribution
+    -------------------------- ----------- --------------
+    Metric Name                Metric Unit   Metric Value
+    -------------------------- ----------- --------------
+    Average DRAM Active Cycles       cycle     13,225,196
+    Total DRAM Elapsed Cycles        cycle 18,872,906,752
+    Average L1 Active Cycles         cycle  53,534,524.22
+    Total L1 Elapsed Cycles          cycle  9,999,379,228
+    Average L2 Active Cycles         cycle     43,675,266
+    Total L2 Elapsed Cycles          cycle 15,219,210,656
+    Average SM Active Cycles         cycle  53,534,524.22
+    Total SM Elapsed Cycles          cycle  9,999,379,228
+    Average SMSP Active Cycles       cycle     43,543,120
+    Total SMSP Elapsed Cycles        cycle 39,997,516,912
+    -------------------------- ----------- --------------
+
+    OPT   Est. Speedup: 21.44%                                                                                          
+          One or more SMs have a much lower number of active cycles than the average number of active cycles. Maximum   
+          instance value is 87.05% above the average, while the minimum instance value is 99.91% below the average.     
+    ----- --------------------------------------------------------------------------------------------------------------
+    OPT   Est. Speedup: 16.02%                                                                                          
+          One or more SMSPs have a much lower number of active cycles than the average number of active cycles. Maximum 
+          instance value is 79.96% above the average, while the minimum instance value is 99.90% below the average.     
+    ----- --------------------------------------------------------------------------------------------------------------
+    OPT   Est. Speedup: 21.44%                                                                                          
+          One or more L1 Slices have a much lower number of active cycles than the average number of active cycles.     
+          Maximum instance value is 87.05% above the average, while the minimum instance value is 99.91% below the      
+          average.                                                                                                      
+
