@@ -10,7 +10,7 @@ c++ (Initial Version with current shading model):
 Runtime: 22.6327 seconds
 c++ (Current Implementation, with new shading model and bvh):
 Runtime: 9.98129 seconds
-CUDA (Initial Implementation, old shading model):
+CUDA (Initial Implementation, old sading model):
 Runtime: 13.4659 second
 CUDA (Current Implementation, including all optimizations, as well as shadows and reflections):
 Runtime: 0.280268 seconds
