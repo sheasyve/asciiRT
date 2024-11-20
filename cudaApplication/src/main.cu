@@ -6,7 +6,7 @@ int w = 224, h = 224*2;
 // Camera settings
 const float focal_length = 2.16;
 const float field_of_view = 0.7854; // 45 degrees
-const Eigen::Vector3f camera_position(0, 0, -100);
+const Eigen::Vector3f camera_position(0, 0, -100);//-100 for car
 
 // Rotation settings
 bool rotate = true;

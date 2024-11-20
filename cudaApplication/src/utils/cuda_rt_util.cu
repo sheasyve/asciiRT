@@ -22,31 +22,35 @@ __device__ bool ray_box_intersection(const Eigen::Vector3f& ray_origin, const Ei
 }
 
 __device__ int find_closest_triangle(
-    Eigen::Vector3f& ray_origin, Eigen::Vector3f& ray_direction, 
-    BvhTree::Node* nodes, int root_index, Triangle* triangles, float& min_t) 
+    const Eigen::Vector3f& ray_origin, const Eigen::Vector3f& ray_direction,
+    AlignedBox3f* nodes_bbox, int* nodes_left, int* nodes_right, int* nodes_triangle,
+    int root_index, const Triangle* triangles, float& min_t)
 {
+    const int MAX_STACK_SIZE = 64; 
+    int dfs_stack[MAX_STACK_SIZE];
     int stack_index = 0;
     int min_index = -1;
-    int dfs_stack[MAX_STACK_SIZE];
-    dfs_stack[stack_index++] = root_index;
-    
+
+    dfs_stack[stack_index++] = root_index; 
     while (stack_index > 0) {
-        int node_index = dfs_stack[--stack_index];
-        BvhTree::Node node = nodes[node_index];
-        
-        if (ray_box_intersection(ray_origin, ray_direction, node.bbox)) {
-            if (node.left == -1 && node.right == -1) { // Leaf node, check for min intersection
-                int tri_idx = node.triangle;
+        int node_index = dfs_stack[--stack_index]; 
+
+        // Bounds check for node_index
+        if (node_index < 0) continue;
+
+        if (ray_box_intersection(ray_origin, ray_direction, nodes_bbox[node_index])) {
+            if (nodes_left[node_index] == -1 && nodes_right[node_index] == -1) { // Leaf node
+                int tri_idx = nodes_triangle[node_index];
                 float t = triangles[tri_idx].intersects(ray_origin, ray_direction);
-                
-                if (t > 0 && t < min_t) { // Found new closest intersecting triangle
+                if (t > 0 && t < min_t) { // Update closest triangle
                     min_t = t;
                     min_index = tri_idx;
                 }
-            } else {
-                if (node.left != -1) dfs_stack[stack_index++] = node.left;
-                if (node.right != -1) dfs_stack[stack_index++] = node.right;
-                if (stack_index >= MAX_STACK_SIZE) break; // Prevent stack overflow
+            } else { // Internal node, push children onto stack
+                if (nodes_right[node_index] != -1 && stack_index < MAX_STACK_SIZE)
+                    dfs_stack[stack_index++] = nodes_right[node_index];
+                if (nodes_left[node_index] != -1 && stack_index < MAX_STACK_SIZE)
+                    dfs_stack[stack_index++] = nodes_left[node_index];
             }
         }
     }

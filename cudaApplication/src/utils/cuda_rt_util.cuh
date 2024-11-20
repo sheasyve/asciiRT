@@ -15,8 +15,15 @@ __device__ bool ray_box_intersection(
 );
 
 __device__ int find_closest_triangle(
-    Vector3f& ray_origin,Vector3f& ray_direction, BvhTree::Node* nodes, int root_index,
-    Triangle* triangles, float& min_t
+    const Eigen::Vector3f& ray_origin,
+    const Eigen::Vector3f& ray_direction,
+    AlignedBox3f* nodes_bbox,
+    int* nodes_left,
+    int* nodes_right,
+    int* nodes_triangle,
+    int root_index,
+    const Triangle* triangles,
+    float& min_t
 );
 
 std::vector<Triangle> get_triangles(const std::vector<Mesh>& meshes);

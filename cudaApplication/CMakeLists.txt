@@ -31,6 +31,7 @@ target_compile_options(${PROJECT_NAME} PRIVATE
         -O2
         -Wall
         --expt-relaxed-constexpr
+        -maxrregcount=64
     >
     $<$<COMPILE_LANGUAGE:CXX>:
         -O3

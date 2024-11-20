@@ -9,11 +9,15 @@ AlignedBox3f bbox_from_triangle(const Eigen::Vector3f &a, const Eigen::Vector3f 
 }
 
 BvhTree::BvhTree(const std::vector<Triangle>& triangles){
+    size_t max_nodes = triangles.size() * 2 - 1; // Maximum possible nodes in a binary tree
+    nodes.allocate(max_nodes);
     // Compute centroids of all triangles
     std::vector<Eigen::Vector3f> centroids(triangles.size());
-    for (size_t i = 0; i < triangles.size(); ++i) centroids[i] = (triangles[i].p1 + triangles[i].p2 + triangles[i].p3) / 3.0;
+    for (size_t i = 0; i < triangles.size(); ++i)
+        centroids[i] = (triangles[i].p1 + triangles[i].p2 + triangles[i].p3) / 3.0;
     std::vector<int> indexes(triangles.size());
-    for (size_t i = 0; i < triangles.size(); ++i) indexes[i] = static_cast<int>(i);
+    for (size_t i = 0; i < triangles.size(); ++i)
+        indexes[i] = static_cast<int>(i);
     indexes = sort_triangles(centroids);
     root = build_tree(indexes, triangles);
 }
@@ -58,33 +62,30 @@ std::vector<int> BvhTree::sort_triangles(const std::vector<Eigen::Vector3f>& cen
 
 int BvhTree::build_tree(const std::vector<int>& indexes, const std::vector<Triangle>& triangles){
     if (indexes.size() == 1) {
-        Node n;
-        n.triangle = indexes[0];
+        int node_index = nodes.num_nodes++;
+        nodes.triangle[node_index] = indexes[0];
         const Triangle& tri = triangles[indexes[0]];
-        n.bbox = bbox_from_triangle(tri.p1, tri.p2, tri.p3);
-        n.left = -1;
-        n.right = -1;
-        n.parent = -1;
-        nodes.push_back(n);
-        return static_cast<int>(nodes.size()) - 1;
+        nodes.bbox[node_index] = bbox_from_triangle(tri.p1, tri.p2, tri.p3);
+        nodes.left[node_index] = -1;
+        nodes.right[node_index] = -1;
+        nodes.parent[node_index] = -1;
+        return node_index;
     }
     size_t mid = indexes.size() / 2;
     std::vector<int> left_indexes(indexes.begin(), indexes.begin() + mid);
     std::vector<int> right_indexes(indexes.begin() + mid, indexes.end());
-    //Build recursively
+    // Build recursively
     int left_root = build_tree(left_indexes, triangles);
     int right_root = build_tree(right_indexes, triangles);
-    //Create parent node
-    Node n;
-    n.bbox = nodes[left_root].bbox;
-    n.bbox.extend(nodes[right_root].bbox);
-    n.left = left_root;
-    n.right = right_root;
-    n.triangle = -1;
-    n.parent = -1;
-    nodes.push_back(n);
-    int parent_index = static_cast<int>(nodes.size()) - 1;
-    nodes[left_root].parent = parent_index;
-    nodes[right_root].parent = parent_index;
-    return parent_index;
+    // Create parent node
+    int node_index = nodes.num_nodes++;
+    nodes.bbox[node_index] = nodes.bbox[left_root];
+    nodes.bbox[node_index].extend(nodes.bbox[right_root]);
+    nodes.left[node_index] = left_root;
+    nodes.right[node_index] = right_root;
+    nodes.triangle[node_index] = -1;
+    nodes.parent[node_index] = -1;
+    nodes.parent[left_root] = node_index;
+    nodes.parent[right_root] = node_index;
+    return node_index;
 }
