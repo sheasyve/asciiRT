@@ -4,38 +4,20 @@
 
 __device__ bool ray_box_intersection(const V3f& ray_origin, const V3f& ray_direction, const AABB& bbox) {
     float tmin = -FLT_MAX, tmax = FLT_MAX;
-    const float EPSILON = 1e-8f; // Small value to handle near-zero directions
 
     for (int i = 0; i < 3; ++i) {
-        float ray_dir = ray_direction[i];
-        float origin = ray_origin[i];
-        float minB = bbox.min[i];
-        float maxB = bbox.max[i];
-        if (fabsf(ray_dir) < EPSILON) {
-            // Ray is parallel to slab. No hit if origin not within slab
-            if (origin < minB || origin > maxB) {
-                return false;
-            }
-        } else {
-            float invD = 1.0f / ray_dir;
-            float t0 = (minB - origin) * invD;
-            float t1 = (maxB - origin) * invD;
-
-            if (invD < 0.0f) {
-                // Swap t0 and t1
-                float temp = t0;
-                t0 = t1;
-                t1 = temp;
-            }
-
-            tmin = fmaxf(tmin, t0);
-            tmax = fminf(tmax, t1);
-
-            if (tmin > tmax) {
-    return false;
-}
-
+        float invD = 1.0f / ray_direction[i];
+        float t0 = (bbox.min[i] - ray_origin[i]) * invD;
+        float t1 = (bbox.max[i] - ray_origin[i]) * invD;
+        
+        if (invD < 0.0f) {
+            float temp = t0; t0 = t1; t1 = temp;
         }
+
+        tmin = fmaxf(tmin, t0);
+        tmax = fminf(tmax, t1);
+
+        if (tmax < tmin) return false;
     }
     return true;
 }
@@ -59,7 +41,7 @@ __device__ int find_closest_triangle(
         if (ray_box_intersection(ray_origin, ray_direction, nodes_bbox[node_index])) {
             if (nodes_left[node_index] == -1 && nodes_right[node_index] == -1) { // Leaf node
                 int tri_idx = nodes_triangle[node_index];
-                float t = triangles[tri_idx].intersects(ray_origin, ray_direction);
+                float t = triangles[tri_idx].intersects(ray_origin, ray_direction.normalized());
                 if (t > 0.0f && t < min_t) { // Update closest triangle
                     min_t = t;
                     min_index = tri_idx;

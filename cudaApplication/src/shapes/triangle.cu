@@ -6,33 +6,33 @@ Triangle::Triangle(V3f p1, V3f p2, V3f p3)
 
 __device__ __host__
 float Triangle::intersects(const V3f& ray_origin, const V3f& ray_direction) const {
-    // Edge vectors
-    V3f edge1 = p2 - p1;
-    V3f edge2 = p3 - p1;
-
+    const float EPSILON = 1e-8f;
+    // Compute edges
+    V3f e12 = p2 - p1;
+    V3f e13 = p3 - p1;
     // Compute determinant
-    V3f h = ray_direction.cross(edge2);
-    float det = edge1.dot(h);
-
-    // Cull backfacing and parallel triangles
-    if (det > -1e-8 && det < 1e-8) return -1.0f;
+    V3f ray_cross_e13 = ray_direction.cross(e13);
+    float det = e12.dot(ray_cross_e13);
+    if (det > -EPSILON && det < EPSILON) {
+        return -1.0f; // No intersection
+    }
     float inv_det = 1.0f / det;
-
-    // Compute u parameter and test bounds
     V3f s = ray_origin - p1;
-    float u = s.dot(h) * inv_det;
-    if (u < 0.0f || u > 1.0f) return -1.0f;
-
-    // Compute v parameter and test bounds
-    V3f q = s.cross(edge1);
-    float v = ray_direction.dot(q) * inv_det;
-    if (v < 0.0f || u + v > 1.0f) return -1.0f;
-
-    // Compute t, the distance to the intersection point
-    float t = edge2.dot(q) * inv_det;
-
-    // Return t if positive (intersection), otherwise return -1
-    return (t > 0.0f) ? t : -1.0f;
+    float u = inv_det * s.dot(ray_cross_e13);
+    if (u < 0.0f || u > 1.0f) {
+        return -1.0f;
+    }
+    V3f s_cross_e12 = s.cross(e12);
+    float v = inv_det * ray_direction.dot(s_cross_e12);
+    if (v < 0.0f || u + v > 1.0f) {
+        return -1.0f;
+    }
+    float t = inv_det * e13.dot(s_cross_e12);
+    if (t < EPSILON) {
+        return -1.0f;
+    }
+    printf("triangle intersect");
+    return t;
 }
 
 __device__ __host__

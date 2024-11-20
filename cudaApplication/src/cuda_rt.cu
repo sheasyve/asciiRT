@@ -15,7 +15,6 @@ __global__ void d_raytrace(
     int idx = y * width + x;
     V3f origin = ray_origins[idx];
     V3f direction = ray_directions[idx];
-
     // Shared memory allocation for lights
     extern __shared__ char shared_mem[];
     V3f *shared_light_positions = (V3f *)shared_mem;
@@ -87,7 +86,8 @@ float *h_raytrace(
     int tree_size = bvh.nodes.num_nodes;
     int root = bvh.root;
     float *h_output = new float[size];
-
+    std::cout << bvh.nodes.bbox[0].min[1] << " " << bvh.nodes.bbox[0].max[1];
+ 
     // Device pointers
     V3f *d_ray_origins = nullptr;
     V3f *d_ray_directions = nullptr;
