@@ -34,7 +34,6 @@ __global__ void d_raytrace(
         float local_brightness = 0.005, min_t = INF;
         int mindex = find_closest_triangle(origin, direction, nodes_bbox, nodes_left, nodes_right, nodes_triangle, root_index, triangles, min_t);
         if (mindex == -1) break;
-
         // Compute intersection point and normal
         V3f p = origin + direction * min_t;
         V3f N = triangles[mindex].normal().normalized();
@@ -68,7 +67,6 @@ __global__ void d_raytrace(
         direction = direction.normalized();
         origin = p + direction * 1e-4f;
     }
-
     output[idx] = brightness;
 }
 
@@ -134,6 +132,7 @@ float *h_raytrace(
     dim3 blockDim(blockSize);
     dim3 gridDim((width + blockDim.x - 1) / blockDim.x, (height + blockDim.y - 1) / blockDim.y);
     size_t smem_size = num_lights * (sizeof(V3f) + sizeof(V4f));
+    
     d_raytrace<<<gridDim, blockDim, smem_size>>>(
         d_ray_origins, d_ray_directions,
         d_bbox, d_left, d_right, d_triangle, root,

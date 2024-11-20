@@ -4,6 +4,10 @@
 #include "../shapes/triangle.cuh"
 #include "../shapes/mesh.cuh"
 #include "util.cuh"
+#include <vector>  
+#include <string>  
+#include <sstream> 
+#include <istream> 
 
 class LoadMesh {
 public:

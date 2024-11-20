@@ -1,10 +1,5 @@
 #include "load_mesh.cuh"
 
-#include <sstream>   
-#include <fstream>   
-#include <variant>  
-#include <vector>    
-
 LoadMesh::LoadMesh(const M4f& transform, std::istream& input_stream) {
     std::vector<V4f> points;
 

@@ -5,7 +5,7 @@
 #include <cfloat>
 
 // Utility function for swapping
-__device__ __host__ void swap(float& a, float& b) {
+__device__ __host__ inline void swap(float& a, float& b) {
     float temp = a;
     a = b;
     b = temp;
@@ -37,26 +37,8 @@ struct AABB {
         max.z = fmaxf(max.z, other.max.z);
     }
     
-    __device__ __host__ bool intersect(const V3f& ray_origin, const V3f& ray_dir_inv) const {
-        float tmin = (min.x - ray_origin.x) * ray_dir_inv.x;
-        float tmax = (max.x - ray_origin.x) * ray_dir_inv.x;
-        if (tmin > tmax) swap(tmin, tmax);
 
-        float tymin = (min.y - ray_origin.y) * ray_dir_inv.y;
-        float tymax = (max.y - ray_origin.y) * ray_dir_inv.y;
-        if (tymin > tymax) swap(tymin, tymax);
 
-        if ((tmin > tymax) || (tymin > tmax)) return false;
-
-        tmin = fmaxf(tmin, tymin);
-        tmax = fminf(tmax, tymax);
-
-        float tzmin = (min.z - ray_origin.z) * ray_dir_inv.z;
-        float tzmax = (max.z - ray_origin.z) * ray_dir_inv.z;
-        if (tzmin > tzmax) swap(tzmin, tzmax);
-
-        return !(tmin > tzmax || tzmin > tmax);
-    }
 };
 
 #endif // AABB_CUH
