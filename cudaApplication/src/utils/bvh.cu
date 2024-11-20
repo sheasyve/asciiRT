@@ -1,7 +1,7 @@
 #include "bvh.cuh"
 
-AlignedBox3f bbox_from_triangle(const Eigen::Vector3f &a, const Eigen::Vector3f &b, const Eigen::Vector3f &c){
-    AlignedBox3f box;
+AABB bbox_from_triangle(const V3f &a, const V3f &b, const V3f &c){
+    AABB box;
     box.extend(a);
     box.extend(b);
     box.extend(c);
@@ -12,9 +12,9 @@ BvhTree::BvhTree(const std::vector<Triangle>& triangles){
     size_t max_nodes = triangles.size() * 2 - 1; // Maximum possible nodes in a binary tree
     nodes.allocate(max_nodes);
     // Compute centroids of all triangles
-    std::vector<Eigen::Vector3f> centroids(triangles.size());
+    std::vector<V3f> centroids(triangles.size());
     for (size_t i = 0; i < triangles.size(); ++i)
-        centroids[i] = (triangles[i].p1 + triangles[i].p2 + triangles[i].p3) / 3.0;
+        centroids[i] = (triangles[i].p1 + triangles[i].p2 + triangles[i].p3) / 3.0f;
     std::vector<int> indexes(triangles.size());
     for (size_t i = 0; i < triangles.size(); ++i)
         indexes[i] = static_cast<int>(i);
@@ -22,18 +22,18 @@ BvhTree::BvhTree(const std::vector<Triangle>& triangles){
     root = build_tree(indexes, triangles);
 }
 
-void BvhTree::get_longest_axis(const std::vector<Eigen::Vector3f>& centroids){
+void BvhTree::get_longest_axis(const std::vector<V3f>& centroids) {
     float xmin = std::numeric_limits<float>::infinity(), xmax = -std::numeric_limits<float>::infinity();
     float ymin = std::numeric_limits<float>::infinity(), ymax = -std::numeric_limits<float>::infinity();
     float zmin = std::numeric_limits<float>::infinity(), zmax = -std::numeric_limits<float>::infinity();
 
     for (const auto& c : centroids) {
-        if (c.x() < xmin) xmin = c.x();
-        if (c.x() > xmax) xmax = c.x();
-        if (c.y() < ymin) ymin = c.y();
-        if (c.y() > ymax) ymax = c.y();
-        if (c.z() < zmin) zmin = c.z();
-        if (c.z() > zmax) zmax = c.z();
+        if (c.x < xmin) xmin = c.x;
+        if (c.x > xmax) xmax = c.x;
+        if (c.y < ymin) ymin = c.y;
+        if (c.y > ymax) ymax = c.y;
+        if (c.z < zmin) zmin = c.z;
+        if (c.z > zmax) zmax = c.z;
     }
 
     float xd = xmax - xmin;
@@ -45,15 +45,16 @@ void BvhTree::get_longest_axis(const std::vector<Eigen::Vector3f>& centroids){
     else longest_axis = 2;
 }
 
-// Method to sort triangles based on the longest axis
-std::vector<int> BvhTree::sort_triangles(const std::vector<Eigen::Vector3f>& centroids){
+std::vector<int> BvhTree::sort_triangles(const std::vector<V3f>& centroids){
     std::vector<triangle_centroid> triangles(centroids.size());
     for (size_t i = 0; i < centroids.size(); i++) {
         triangles[i].centroid = centroids[i];
         triangles[i].index = static_cast<int>(i);
     }
     get_longest_axis(centroids);
-    auto compare = [this](const triangle_centroid& t1, const triangle_centroid& t2) {return t1.centroid[longest_axis] < t2.centroid[longest_axis];};
+    auto compare = [this](const triangle_centroid& t1, const triangle_centroid& t2) {
+        return t1.centroid[longest_axis] < t2.centroid[longest_axis];
+    };
     std::sort(triangles.begin(), triangles.end(), compare);
     std::vector<int> sorted_indexes(centroids.size());
     for (size_t i = 0; i < centroids.size(); ++i) sorted_indexes[i] = triangles[i].index;
@@ -80,7 +81,7 @@ int BvhTree::build_tree(const std::vector<int>& indexes, const std::vector<Trian
     // Create parent node
     int node_index = nodes.num_nodes++;
     nodes.bbox[node_index] = nodes.bbox[left_root];
-    nodes.bbox[node_index].extend(nodes.bbox[right_root]);
+    nodes.bbox[node_index].merge(nodes.bbox[right_root]);
     nodes.left[node_index] = left_root;
     nodes.right[node_index] = right_root;
     nodes.triangle[node_index] = -1;

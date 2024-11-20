@@ -1,10 +1,10 @@
 #ifndef MAIN_UTIL_CUH
 #define MAIN_UTIL_CUH
 
-#include "util.hpp"
+#include "util.cuh"
 #include "load_mesh.cuh"
 #include "matrix_util.cuh"
-#include "ascii_print.hpp"
+#include "ascii_print.cuh"
 #include "../cuda_rt.cuh"
 #include "../shapes/triangle.cuh"
 #include "../shapes/mesh.cuh"

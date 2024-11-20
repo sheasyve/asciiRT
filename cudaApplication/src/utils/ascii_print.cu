@@ -1,4 +1,4 @@
-#include "ascii_print.hpp"
+#include "ascii_print.cuh"
 
 std::pair<int, int> find_boundary(float* color, int w, int h) {
     //Find the first and last non-empty lines to print without extra whitespace

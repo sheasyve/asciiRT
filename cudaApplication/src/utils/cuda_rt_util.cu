@@ -1,19 +1,19 @@
 #include "cuda_rt_util.cuh"
 
-__device__ bool ray_box_intersection(const Eigen::Vector3f& ray_origin, const Eigen::Vector3f& ray_direction, const AlignedBox3f& bbox) {
-    //Intersection of ray and axis-aligned bounding box
+__device__ bool ray_box_intersection(const V3f& ray_origin, const V3f& ray_direction, const AABB& bbox) {
+    // Intersection of ray and axis-aligned bounding box
     float tmin = NINF, tmax = INF;
     for (int i = 0; i < 3; ++i) {
-        float invD = 1.0 / ray_direction[i];
-        float t0 = (bbox.min()[i] - ray_origin[i]) * invD;
-        float t1 = (bbox.max()[i] - ray_origin[i]) * invD;
-        if (invD < 0.0) {// Swap t0 and t1
+        float invD = 1.0f / ray_direction[i];
+        float t0 = (bbox.min[i] - ray_origin[i]) * invD;
+        float t1 = (bbox.max[i] - ray_origin[i]) * invD;
+        if (invD < 0.0f) { // Swap t0 and t1
             float temp = t0;
             t0 = t1;
             t1 = temp;
         }
-        tmin = fmax(tmin, t0);
-        tmax = fmin(tmax, t1);
+        tmin = fmaxf(tmin, t0);
+        tmax = fminf(tmax, t1);
         if (tmax <= tmin) {
             return false;
         }
@@ -22,8 +22,8 @@ __device__ bool ray_box_intersection(const Eigen::Vector3f& ray_origin, const Ei
 }
 
 __device__ int find_closest_triangle(
-    const Eigen::Vector3f& ray_origin, const Eigen::Vector3f& ray_direction,
-    AlignedBox3f* nodes_bbox, int* nodes_left, int* nodes_right, int* nodes_triangle,
+    const V3f& ray_origin, const V3f& ray_direction,
+    AABB* nodes_bbox, int* nodes_left, int* nodes_right, int* nodes_triangle,
     int root_index, const Triangle* triangles, float& min_t)
 {
     const int MAX_STACK_SIZE = 64; 
@@ -57,9 +57,8 @@ __device__ int find_closest_triangle(
     return min_index;
 }
 
-
 std::vector<Triangle> get_triangles(const std::vector<Mesh>& meshes) {
-    //Extracts all triangles from all input meshes
+    // Extracts all triangles from all input meshes
     std::vector<Triangle> triangles;
     for (const auto& mesh : meshes) {
         triangles.insert(triangles.end(), mesh.triangles.begin(), mesh.triangles.end());
