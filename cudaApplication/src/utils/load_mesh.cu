@@ -23,7 +23,6 @@ LoadMesh::LoadMesh(const M4f& transform, std::istream& input_stream) {
                 int vertex_index = std::stoi(vertex_index_str) - 1;       
                 vertex_indices.push_back(vertex_index);
             }
-
             // Handle triangles (3 vertices)
             if (vertex_indices.size() == 3) {
                 int ix = vertex_indices[0], iy = vertex_indices[1], iz = vertex_indices[2];

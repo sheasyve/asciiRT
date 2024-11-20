@@ -57,10 +57,6 @@ void setup_scene(int argc, char* argv[])
 
     light_colors.emplace_back(0.2f, 0.2f, 0.2f, 1.0f); // Light 4
     light_positions.emplace_back(-10, 20, -30);
-    std::cout << "Number of meshes loaded: " << meshes.size() << "\n";
-    for (size_t i = 0; i < meshes.size(); ++i) {
-        std::cout << "Mesh " << i << " has " << meshes[i].triangles.size() << " triangles.\n";
-    }
 }
 
 int main(int argc, char* argv[])

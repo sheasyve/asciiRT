@@ -74,7 +74,6 @@ float *h_raytrace(
     int tree_size = bvh.nodes.num_nodes;
     int root = bvh.root;
     float *h_output = new float[size];
-    std::cout << bvh.nodes.bbox[0].min[1] << " " << bvh.nodes.bbox[0].max[1];
  
     // Device pointers
     V3f *d_ray_origins = nullptr;
