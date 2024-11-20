@@ -8,7 +8,6 @@ Mesh input_mesh(const std::string& filename) {
         throw std::runtime_error("File opening failed.");
     }
 
-    // Use M4f for the identity matrix
     M4f identity_matrix;
     LoadMesh m(identity_matrix, file_stream);
     return m.get_mesh();

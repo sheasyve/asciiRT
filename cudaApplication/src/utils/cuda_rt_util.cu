@@ -4,7 +4,6 @@
 
 __device__ bool ray_box_intersection(const V3f& ray_origin, const V3f& ray_direction, const AABB& bbox) {
     float tmin = -FLT_MAX, tmax = FLT_MAX;
-
     for (int i = 0; i < 3; ++i) {
         float invD = 1.0f / ray_direction[i];
         float t0 = (bbox.min[i] - ray_origin[i]) * invD;
@@ -13,7 +12,6 @@ __device__ bool ray_box_intersection(const V3f& ray_origin, const V3f& ray_direc
         if (invD < 0.0f) {
             float temp = t0; t0 = t1; t1 = temp;
         }
-
         tmin = fmaxf(tmin, t0);
         tmax = fminf(tmax, t1);
 

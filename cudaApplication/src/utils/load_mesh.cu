@@ -19,8 +19,8 @@ LoadMesh::LoadMesh(const M4f& transform, std::istream& input_stream) {
             std::string vertex;
             while (line_stream >> vertex) {
                 size_t slash_pos = vertex.find('/');
-                std::string vertex_index_str = vertex.substr(0, slash_pos); // Extract before the first '/'
-                int vertex_index = std::stoi(vertex_index_str) - 1;        // Convert to 0-indexed
+                std::string vertex_index_str = vertex.substr(0, slash_pos); 
+                int vertex_index = std::stoi(vertex_index_str) - 1;       
                 vertex_indices.push_back(vertex_index);
             }
 

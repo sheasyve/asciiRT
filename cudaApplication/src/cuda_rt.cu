@@ -132,7 +132,6 @@ float *h_raytrace(
     dim3 blockDim(blockSize);
     dim3 gridDim((width + blockDim.x - 1) / blockDim.x, (height + blockDim.y - 1) / blockDim.y);
     size_t smem_size = num_lights * (sizeof(V3f) + sizeof(V4f));
-    
     d_raytrace<<<gridDim, blockDim, smem_size>>>(
         d_ray_origins, d_ray_directions,
         d_bbox, d_left, d_right, d_triangle, root,

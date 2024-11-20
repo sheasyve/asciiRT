@@ -31,7 +31,6 @@ float Triangle::intersects(const V3f& ray_origin, const V3f& ray_direction) cons
     if (t < EPSILON) {
         return -1.0f;
     }
-    printf("triangle intersect");
     return t;
 }
 
