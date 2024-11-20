@@ -19,7 +19,6 @@ __global__ void d_raytrace(
     extern __shared__ char shared_mem[];
     V3f *shared_light_positions = (V3f *)shared_mem;
     V4f *shared_light_colors = (V4f *)(shared_mem + num_lights * sizeof(V3f));
-
     // Load lights to shared memory
     int threadId = threadIdx.y * blockDim.x + threadIdx.x;
     if (threadId < num_lights) {
@@ -27,7 +26,6 @@ __global__ void d_raytrace(
         shared_light_colors[threadId] = light_colors[threadId];
     }
     __syncthreads();
-
     float brightness = 0.0;
     for (int depth = 0; depth < 3; depth++) { // Perform RT up to depth times for each reflection
         float local_brightness = 0.005, min_t = INF;
@@ -37,32 +35,22 @@ __global__ void d_raytrace(
         V3f p = origin + direction * min_t;
         V3f N = triangles[mindex].normal().normalized();
         V3f V = (-direction).normalized();
-
         // Light calculations
         for (int i = 0; i < num_lights; i++) {
             V3f L = shared_light_positions[i] - p;
             float d = L.norm();
             L = L / d;
-
-            // Shadow ray cast
-            V3f shadow_ray_origin = p + N * 1e-4f;
+            V3f shadow_ray_origin = p + N * 1e-4f;// Shadow ray cast
             float shadow_ray_t = d; // Maximum distance to check (distance to light)
             int shadow_mindex = find_closest_triangle(shadow_ray_origin, L, nodes_bbox, nodes_left, nodes_right, nodes_triangle, root_index, triangles, shadow_ray_t);
-
             float attenuation = (shadow_mindex != -1 && shadow_ray_t > 0.0f) ? 0.0f : (1.0f / fmaf(0.01f, d * d, fmaf(0.1f, d, 1.0f))); // Shadow attenuation
-
             V3f light_rgb = V3f(shared_light_colors[i].x, shared_light_colors[i].y, shared_light_colors[i].z);
-            
-            // Diffuse lighting
-            local_brightness += attenuation * 0.4f * fmaxf(N.dot(L), 0.0f) * light_rgb.norm();
-            
-            // Specular lighting
-            V3f R = (N * 2.0f * N.dot(L) - L).normalized();
+            local_brightness += attenuation * 0.4f * fmaxf(N.dot(L), 0.0f) * light_rgb.norm();// Diffuse lighting
+            V3f R = (N * 2.0f * N.dot(L) - L).normalized();// Specular lighting
             local_brightness += attenuation * 0.4f * powf(fmaxf(R.dot(V), 0.0f), 32.0f) * light_rgb.norm();
         }
-
-        brightness += powf(0.5f, depth) * fminf(local_brightness, 1.0f); // Reflection coefficient
-        direction = direction - N * 2.0f * direction.dot(N);            // Reflect ray
+        brightness += powf(0.5f, depth) * fminf(local_brightness, 1.0f); 
+        direction = direction - N * 2.0f * direction.dot(N);            
         direction = direction.normalized();
         origin = p + direction * 1e-4f;
     }
