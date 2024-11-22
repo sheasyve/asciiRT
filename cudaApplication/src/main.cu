@@ -1,15 +1,15 @@
 #include "utils/main_util.cuh"
 
-// Set up for 2 teapots
+// Set up for car and teapot
 
 // Scene settings
-int w = 224, h = 224 * 2;
-int padding = 4; // Padding above rendered model
+int w = 224 , h = 448 ;
+int padding = 10; // Padding above rendered model
 
 // Camera settings
 const float focal_length = 2.16;
 const float field_of_view = 0.7854; // 45 degrees
-const V3f camera_position(0, 0, -50); // -100 for car
+const V3f camera_position(0, 0, -150); // -100 for car
 
 // Animation settings
 bool animate = true;
@@ -36,9 +36,9 @@ void setup_scene(int argc, char* argv[]){
     rotations.emplace_back(-0.05, 0.4, 0.05);
     rotations.emplace_back(-0.05, 0.4, 0.05);
     translations.emplace_back(0.,0.,0.);
-    translations.emplace_back(6.,-2.,3.);
+    translations.emplace_back(4.,5.,0.);
     rotation_increments.emplace_back(0., 0.05, 0.);
-    rotation_increments.emplace_back(0., -0.05, 0.);
+    rotation_increments.emplace_back(0.01, -0.05, 0.);
     // Rotate and translate
     if (!meshes.empty() > 0 && rotate) {
         for (auto r : rotations) meshes[0].triangles = rotate_mesh(meshes[0], r[0], r[1], r[2]);

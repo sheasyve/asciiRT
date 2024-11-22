@@ -23,7 +23,7 @@ void print_scene_in_ascii(float* color, int w, int h, int padding) {
     const int l = brightness_chars.size() - 1;
     auto [first_line, last_line] = find_boundary(color, w, h);
 
-    for (int p = 0; p < padding; ++p) std::cout << "\n"; // Padding
+    for (int p = 0; p < 2; ++p) std::cout << "\n"; // Padding
 
     // Print the model in ASCII
     for (int j = first_line; j >= last_line; --j) {
