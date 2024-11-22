@@ -11,5 +11,5 @@
 
 Mesh input_mesh(const std::string& filename);
 void load_meshes(int argc, char* argv[], std::vector<Mesh>& meshes);
-
+void warmup_cuda();
 #endif //MAIN_UTIL_HPP

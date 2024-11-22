@@ -39,16 +39,11 @@ void setup_scene(int argc, char* argv[]){
 
     light_colors.emplace_back(0.2f, 0.2f, 0.2f, 1.0f); // Light 4
     light_positions.emplace_back(-10, 20, -30);
-}/*
-float *h_raytrace_async(
-    std::vector<Mesh> meshes,
-    int width, int height,
-    std::vector<V3f> light_positions,
-    std::vector<V4f> light_colors, float focal_length, 
-    float field_of_view, V3f camera_position)
-{*/
+}
+
 int main(int argc, char* argv[])
 {
+    warmup_cuda();
     auto start = std::chrono::high_resolution_clock::now();
     setup_scene(argc, argv);
     float* output = h_raytrace(meshes, w, h, light_positions, light_colors, focal_length, field_of_view, camera_position);

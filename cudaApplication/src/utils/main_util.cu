@@ -17,3 +17,8 @@ void load_meshes(int argc, char* argv[], std::vector<Mesh>& meshes) {
     for (int i = 1; i < argc; ++i) 
         meshes.push_back(input_mesh(argv[i])); // Load a single mesh with the LoadMesh class
 }
+void warmup_cuda() {
+    float *dummy;
+    cudaMalloc(&dummy, sizeof(float));
+    cudaFree(dummy);
+}
