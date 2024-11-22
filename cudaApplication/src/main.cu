@@ -2,6 +2,7 @@
 
 // Scene settings
 int w = 224, h = 224 * 2;
+int padding = 4; // Padding above rendered model
 
 // Camera settings
 const float focal_length = 2.16;
@@ -50,7 +51,7 @@ void animate_main(){
         }
         float* output = h_raytrace(meshes, w, h, light_positions, light_colors, focal_length, field_of_view, camera_position);
         std::cout << "\033[H\033[J"; // Clear the screen
-        print_scene_in_ascii(output, w, h);
+        print_scene_in_ascii(output, w, h, padding);
         delete[] output;
         auto end = std::chrono::high_resolution_clock::now();
         auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
@@ -63,8 +64,8 @@ void animate_main(){
 void photo_main(){
     auto start = std::chrono::high_resolution_clock::now();
     float* output = h_raytrace(meshes, w, h, light_positions, light_colors, focal_length, field_of_view, camera_position);
-    std::cout << "\033[H\033[J"; // Clear the screen
-    print_scene_in_ascii(output, w, h);
+    std::cout << "\033[H\033[J"; 
+    print_scene_in_ascii(output, w, h, padding);
     delete[] output;
     std::cout << "Runtime: " << std::chrono::duration<float>(std::chrono::high_resolution_clock::now() - start).count() << " seconds" << std::endl;
 }
