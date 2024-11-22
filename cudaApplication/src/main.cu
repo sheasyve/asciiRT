@@ -10,6 +10,7 @@ const V3f camera_position(0, 0, -100); // -100 for car
 
 // Rotation settings
 bool rotate = true;
+std::vector<V3f> rotations;
 
 // Lights
 std::vector<V3f> light_positions;
@@ -18,14 +19,14 @@ std::vector<V4f> light_colors;
 // Meshes
 std::vector<Mesh> meshes;
 
-void setup_scene(int argc, char* argv[])
-{
-    load_meshes(argc, argv, meshes);
+void setup_scene(int argc, char* argv[]){
+    load_meshes(argc, argv, meshes);// Load all meshes
 
-    float rX = -0.05, rY = 0.4, rZ = 0.05; // Rotation in radians
-    if (meshes.size() > 0 && rotate)
-        meshes[0].triangles = rotate_mesh(meshes[0], rX, rY, rZ); // Rotate mesh 1
+    rotations.emplace_back(-0.05, 0.4, 0.05);
 
+    if (meshes.size() > 0 && rotate){
+        for (auto r : rotations) meshes[0].triangles = rotate_mesh(meshes[0], r[0], r[1], r[2]); // Rotate mesh n
+    }
     // Add light positions and colors
     light_colors.emplace_back(0.8f, 0.8f, 0.8f, 1.0f); // Light 1
     light_positions.emplace_back(0, 5, -30);
@@ -47,6 +48,5 @@ int main(int argc, char* argv[])
     float* output = h_raytrace(meshes, w, h, light_positions, light_colors, focal_length, field_of_view, camera_position);
     print_scene_in_ascii(output, w, h);
     std::cout << "Runtime: " << std::chrono::duration<float>(std::chrono::high_resolution_clock::now() - start).count() << " seconds" << std::endl;
-
     return 0;
 }
