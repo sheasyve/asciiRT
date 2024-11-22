@@ -18,25 +18,6 @@ std::vector<V4f> light_colors;
 // Meshes
 std::vector<Mesh> meshes;
 
-void gen_rays(int w, int h, std::vector<V3f> &ray_origins, std::vector<V3f> &ray_directions)
-{
-    const float aspect_ratio = float(w) / float(h);
-    const float y = (((focal_length)*sin(field_of_view / 2)) / sin((180 - (90 + ((field_of_view * (180 / M_PI) / 2)))) * (M_PI / 180)));
-    const float x = (y * aspect_ratio);
-    V3f image_origin(-x, y, camera_position[2] - focal_length);
-    V3f x_displacement(2.0 / w * x, 0, 0);
-    V3f y_displacement(0, -2.0 / h * y, 0);
-    for (int j = 0; j < h; j++)
-    {
-        for (int i = 0; i < w; i++)
-        {
-            V3f pixel_center = image_origin + (i + 0.5) * x_displacement + (j + 0.5) * y_displacement;
-            ray_origins.push_back(camera_position);
-            ray_directions.push_back((camera_position - pixel_center).normalized());
-        }
-    }
-}
-
 void setup_scene(int argc, char* argv[])
 {
     load_meshes(argc, argv, meshes);
@@ -62,10 +43,8 @@ void setup_scene(int argc, char* argv[])
 int main(int argc, char* argv[])
 {
     auto start = std::chrono::high_resolution_clock::now();
-    std::vector<V3f> ray_origins, ray_directions;
-    gen_rays(w, h, ray_origins, ray_directions);
     setup_scene(argc, argv);
-    float* output = h_raytrace(ray_origins, ray_directions, meshes, w, h, light_positions, light_colors);
+    float* output = h_raytrace(meshes, w, h, light_positions, light_colors, focal_length, field_of_view, camera_position);
     print_scene_in_ascii(output, w, h);
     std::cout << "Runtime: " << std::chrono::duration<float>(std::chrono::high_resolution_clock::now() - start).count() << " seconds" << std::endl;
 
