@@ -74,6 +74,7 @@ void gen_rays(int w, int h, std::vector<V3f> &ray_origins, std::vector<V3f> &ray
         }
     }
 }
+
 float *h_raytrace(
     std::vector<Mesh> meshes,
     int width, int height,
@@ -85,8 +86,9 @@ float *h_raytrace(
     int num_lights = static_cast<int>(light_positions.size());
     std::vector<Triangle> triangles = get_triangles(meshes);
     int num_triangles = static_cast<int>(triangles.size());
+
     // Gen Rays
-    
+
     std::vector<V3f> ray_origins, ray_directions;
     gen_rays(width, height, ray_origins, ray_directions, focal_length, field_of_view, camera_position);
 

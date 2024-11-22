@@ -2,8 +2,8 @@ Ship:
 // Camera settings
 const float focal_length = 2.16;
 const float field_of_view = 0.7854; // 45 degrees
-const Eigen::Vector3f camera_position(0, 0, -250);
-float rX = -.07, rY = -1.4, rZ = .05; // Rotation IN RADIANS
+const V3f camera_position(0, 0, -250);
+(-.07, -1.4, .05); // Rotation IN RADIANS
 
     light_colors.emplace_back(1, 1, 1, 1); // Light 1
     light_positions.emplace_back(0, 5, -30);
@@ -24,11 +24,11 @@ int w = 224, h = 224*2;
 // Camera settings
 const float focal_length = 2.16;
 const float field_of_view = 0.7854; // 45 degrees
-const Eigen::Vector3f camera_position(0, 0, -400);//-100 for car
+const V3f camera_position(0, 0, -400);//-100 for car
 
 // Rotation settings
 bool rotate = true;
-float rX =-.05, rY =.4, rZ =.05;//Rotation IN RADIANS
+float (-.05, .4, .05);//Rotation IN RADIANS
     light_colors.emplace_back(0.8, 0.8, 0.8, 1); // Light 1
     light_positions.emplace_back(0, 5, -30);
     light_colors.emplace_back(0.4, 0.4, 0.4, 1); // Light 2
