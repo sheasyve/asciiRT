@@ -14,9 +14,11 @@ bool animate = true;
 constexpr int TARGET_FPS = 24;
 constexpr int FRAME_TIME_MS = 1000 / TARGET_FPS;
 
-// Rotation settings
+// Rotation and translation settings
 bool rotate = true;
+bool translate = true;
 std::vector<V3f> rotations;
+std::vector<V3f> translations;
 V3f rotation_increment(0, 0.05, 0);
 
 // Lights
@@ -29,9 +31,9 @@ std::vector<Mesh> meshes;
 void setup_scene(int argc, char* argv[]){
     load_meshes(argc, argv, meshes); // Load all meshes
     rotations.emplace_back(-0.05, 0.4, 0.05);
-    if (meshes.size() > 0 && rotate) {
-        for (auto r : rotations) meshes[0].triangles = rotate_mesh(meshes[0], r[0], r[1], r[2]); // Rotate mesh n
-    }
+    // Rotate and translate
+    if (!meshes.empty() > 0 && rotate) for (auto r : rotations) meshes[0].triangles = rotate_mesh(meshes[0], r[0], r[1], r[2]); 
+    if (!meshes.empty() && translate) meshes[0].triangles = translate_mesh(meshes[0], rotation_increment[0], rotation_increment[1], rotation_increment[2]);
     // Add light positions and colors
     light_colors.emplace_back(0.8f, 0.8f, 0.8f, 1.0f); // Light 1
     light_positions.emplace_back(0, 5, -30);
