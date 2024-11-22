@@ -86,18 +86,8 @@ float *h_raytrace(
     int num_lights = static_cast<int>(light_positions.size());
     std::vector<Triangle> triangles = get_triangles(meshes);
     int num_triangles = static_cast<int>(triangles.size());
-
-    // Gen Rays
-
-    std::vector<V3f> ray_origins, ray_directions;
-    gen_rays(width, height, ray_origins, ray_directions, focal_length, field_of_view, camera_position);
-
-    // Build BVH
-    BvhTree bvh(triangles);
-    int tree_size = bvh.nodes.num_nodes;
-    int root = bvh.root;
     float *h_output = new float[size];
- 
+
     // Device pointers
     V3f *d_ray_origins = nullptr;
     V3f *d_ray_directions = nullptr;
@@ -105,38 +95,49 @@ float *h_raytrace(
     float *d_output = nullptr;
     V3f *d_lights = nullptr;
     V4f *d_light_colors = nullptr;
-    AABB *d_bbox = nullptr;
-    int *d_parent = nullptr;
-    int *d_left = nullptr;
-    int *d_right = nullptr;
-    int *d_triangle = nullptr;
+    cudaStream_t stream1, stream2;
+    cudaStreamCreate(&stream1);
+    cudaStreamCreate(&stream2);
 
-    // Allocate memory
+    cudaMallocAsync((void **)&d_triangles, num_triangles * sizeof(Triangle), stream1);
+    cudaMallocAsync((void **)&d_lights, num_lights * sizeof(V3f), stream2);
+    cudaMallocAsync((void **)&d_light_colors, num_lights * sizeof(V4f), stream2);
+    cudaMallocAsync((void **)&d_output, size * sizeof(float), stream1);
+    cudaMemcpyAsync(d_triangles, triangles.data(), num_triangles * sizeof(Triangle), cudaMemcpyHostToDevice, stream1);
+    cudaMemcpyAsync(d_lights, light_positions.data(), num_lights * sizeof(V3f), cudaMemcpyHostToDevice, stream2);
+    cudaMemcpyAsync(d_light_colors, light_colors.data(), num_lights * sizeof(V4f), cudaMemcpyHostToDevice, stream2);
+
+    BvhTree bvh(triangles);
+    int tree_size = bvh.nodes.num_nodes;
+
+    std::vector<V3f> ray_origins, ray_directions;
+    gen_rays(width, height, ray_origins, ray_directions, focal_length, field_of_view, camera_position);
+
+    cudaMalloc((void **)&d_ray_origins, size * sizeof(V3f));
+    cudaMalloc((void **)&d_ray_directions, size * sizeof(V3f));
+
+    cudaMemcpy(d_ray_origins, ray_origins.data(), size * sizeof(V3f), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_ray_directions, ray_directions.data(), size * sizeof(V3f), cudaMemcpyHostToDevice);
+
+    AABB *d_bbox = nullptr;
+    int *d_parent = nullptr, *d_left = nullptr, *d_right = nullptr, *d_triangle = nullptr;
+
     cudaMalloc((void **)&d_bbox, tree_size * sizeof(AABB));
     cudaMalloc((void **)&d_parent, tree_size * sizeof(int));
     cudaMalloc((void **)&d_left, tree_size * sizeof(int));
     cudaMalloc((void **)&d_right, tree_size * sizeof(int));
     cudaMalloc((void **)&d_triangle, tree_size * sizeof(int));
-    cudaMalloc((void **)&d_ray_origins, size * sizeof(V3f));
-    cudaMalloc((void **)&d_ray_directions, size * sizeof(V3f));
-    cudaMalloc((void **)&d_triangles, num_triangles * sizeof(Triangle));
-    cudaMalloc((void **)&d_output, size * sizeof(float));
-    cudaMalloc((void **)&d_lights, num_lights * sizeof(V3f));
-    cudaMalloc((void **)&d_light_colors, num_lights * sizeof(V4f));
 
-    // Copy data to device
-    cudaMemcpy(d_ray_origins, ray_origins.data(), size * sizeof(V3f), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_ray_directions, ray_directions.data(), size * sizeof(V3f), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_triangles, triangles.data(), num_triangles * sizeof(Triangle), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_lights, light_positions.data(), num_lights * sizeof(V3f), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_light_colors, light_colors.data(), num_lights * sizeof(V4f), cudaMemcpyHostToDevice);
     cudaMemcpy(d_bbox, bvh.nodes.bbox, tree_size * sizeof(AABB), cudaMemcpyHostToDevice);
     cudaMemcpy(d_parent, bvh.nodes.parent, tree_size * sizeof(int), cudaMemcpyHostToDevice);
     cudaMemcpy(d_left, bvh.nodes.left, tree_size * sizeof(int), cudaMemcpyHostToDevice);
     cudaMemcpy(d_right, bvh.nodes.right, tree_size * sizeof(int), cudaMemcpyHostToDevice);
     cudaMemcpy(d_triangle, bvh.nodes.triangle, tree_size * sizeof(int), cudaMemcpyHostToDevice);
 
-    // Kernel
+    cudaStreamSynchronize(stream1);
+    cudaStreamSynchronize(stream2);
+
+    // Kernel launch
     int minGridSize, blockSize = 16;
     cudaOccupancyMaxPotentialBlockSize(&minGridSize, &blockSize, d_raytrace, 0, 0);
     dim3 blockDim(blockSize);
@@ -144,22 +145,27 @@ float *h_raytrace(
     size_t smem_size = num_lights * (sizeof(V3f) + sizeof(V4f));
     d_raytrace<<<gridDim, blockDim, smem_size>>>(
         d_ray_origins, d_ray_directions,
-        d_bbox, d_left, d_right, d_triangle, root,
+        d_bbox, d_left, d_right, d_triangle, bvh.root,
         d_triangles, d_output,
         width, height,
         d_lights, d_light_colors, num_lights);
-    // Copy back and free
-    cudaError_t err = cudaDeviceSynchronize();
-    if (err != cudaSuccess)
-        printf("CUDA error. %s\n", cudaGetErrorString(err));
+
     cudaMemcpy(h_output, d_output, size * sizeof(float), cudaMemcpyDeviceToHost);
-    // Free memory
+
+    cudaFree(d_ray_origins);
+    cudaFree(d_ray_directions);
+    cudaFree(d_triangles);
+    cudaFree(d_output);
+    cudaFree(d_lights);
+    cudaFree(d_light_colors);
     cudaFree(d_bbox);
     cudaFree(d_parent);
     cudaFree(d_left);
     cudaFree(d_right);
     cudaFree(d_triangle);
-    cudaFree(d_ray_origins);
-    cudaFree(d_ray_directions);
+
+    cudaStreamDestroy(stream1);
+    cudaStreamDestroy(stream2);
+
     return h_output;
 }
