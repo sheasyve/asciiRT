@@ -56,44 +56,19 @@ __global__ void d_raytrace(
     }
     output[idx] = brightness;
 }
-void gen_rays(int w, int h, std::vector<V3f> &ray_origins, std::vector<V3f> &ray_directions, float focal_length, float field_of_view, V3f camera_position)
-{
-    const float aspect_ratio = float(w) / float(h);
-    const float y = (((focal_length)*sin(field_of_view / 2)) / sin((180 - (90 + ((field_of_view * (180 / M_PI) / 2)))) * (M_PI / 180)));
-    const float x = (y * aspect_ratio);
-    V3f image_origin(-x, y, camera_position[2] - focal_length);
-    V3f x_displacement(2.0 / w * x, 0, 0);
-    V3f y_displacement(0, -2.0 / h * y, 0);
-    for (int j = 0; j < h; j++)
-    {
-        for (int i = 0; i < w; i++)
-        {
-            V3f pixel_center = image_origin + (i + 0.5) * x_displacement + (j + 0.5) * y_displacement;
-            ray_origins.push_back(camera_position);
-            ray_directions.push_back((camera_position - pixel_center).normalized());
-        }
-    }
-}
+
 
 float *h_raytrace(
-    std::vector<Mesh> meshes,
+    std::vector<Triangle> triangles,
     int width, int height,
     std::vector<V3f> light_positions,
     std::vector<V4f> light_colors, float focal_length, 
-    float field_of_view, V3f camera_position)
+    float field_of_view, V3f camera_position, BvhTree bvh,
+    std::vector<V3f> ray_origins, std::vector<V3f> ray_directions)
 {
     int size = width * height;
     int num_lights = static_cast<int>(light_positions.size());
-    std::vector<Triangle> triangles = get_triangles(meshes);
     int num_triangles = static_cast<int>(triangles.size());
-
-    // Gen Rays
-
-    std::vector<V3f> ray_origins, ray_directions;
-    gen_rays(width, height, ray_origins, ray_directions, focal_length, field_of_view, camera_position);
-
-    // Build BVH
-    BvhTree bvh(triangles);
     int tree_size = bvh.nodes.num_nodes;
     int root = bvh.root;
     float *h_output = new float[size];
