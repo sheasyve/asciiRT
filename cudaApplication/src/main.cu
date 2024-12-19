@@ -1,6 +1,6 @@
 #include "utils/main_util.cuh"
 
-// Set up for car and teapot
+// Set up for an animation with car and teapot
 
 // Scene settings
 int w = 224 , h = 448 ;
