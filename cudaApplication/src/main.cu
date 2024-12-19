@@ -12,7 +12,7 @@ const V3f camera_position(0., .75, -45);
 
 // Animation settings
 bool animate = true;
-constexpr int TARGET_FPS = 24;
+constexpr int TARGET_FPS = 60;
 constexpr int FRAME_TIME_MS = 1000 / TARGET_FPS;
 
 // Rotation and translation settings
