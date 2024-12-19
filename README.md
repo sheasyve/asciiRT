@@ -1,6 +1,6 @@
 # AsciiRT - Ascii based ray-tracing engine in CUDA
 ![mark](https://github.com/user-attachments/assets/65d30e8a-a69d-47cb-986b-1a8c72d2b514)
-[Animation Demo](https://zenodo.org/records/14524704)
+[Real Time Animation Demo](https://zenodo.org/records/14524704)
 #### There is a c++ version and a CUDA version in respective folders.
 - *CUDA application*
 Build with cmake.
