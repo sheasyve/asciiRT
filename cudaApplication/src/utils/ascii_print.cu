@@ -1,4 +1,4 @@
-#include "ascii_print.hpp"
+#include "ascii_print.cuh"
 
 std::pair<int, int> find_boundary(float* color, int w, int h) {
     //Find the first and last non-empty lines to print without extra whitespace
@@ -17,18 +17,22 @@ std::pair<int, int> find_boundary(float* color, int w, int h) {
     return {first_line, last_line}; 
 }
 
-void print_scene_in_ascii(float* color, int w, int h) {
+void print_scene_in_ascii(float* color, int w, int h, int padding) {
     // ASCII characters for brightness levels
     const std::string brightness_chars = " `.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@";
     const int l = brightness_chars.size() - 1;
     auto [first_line, last_line] = find_boundary(color, w, h);
+
+    for (int p = 0; p < 2; ++p) std::cout << "\n"; // Padding
+
+    // Print the model in ASCII
     for (int j = first_line; j >= last_line; --j) {
         for (int i = 0; i < w; ++i) {
-            double brightness = color[j*w + i];
+            double brightness = color[j * w + i];
             brightness = std::max(0.0, std::min(1.0, brightness)); // Clamp brightness between 0 and 1
             char c = brightness_chars[static_cast<int>(l * brightness)];
             std::cout << c;
         }
-        std::cout << std::endl;
+        std::cout << "\n";
     }
 }

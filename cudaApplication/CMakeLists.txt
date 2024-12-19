@@ -5,10 +5,13 @@ project(ascii_rt LANGUAGES CXX CUDA)
 set(CMAKE_CUDA_STANDARD 20)
 set(CMAKE_CUDA_STANDARD_REQUIRED True)
 
+# Include Eigen3
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
-include_directories("/usr/include/eigen3")
-include_directories("${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}")
 
+# Include CUDA
+find_package(CUDAToolkit REQUIRED)
+
+# Add executable
 add_executable(${PROJECT_NAME} 
     src/main.cu
     src/utils/load_mesh.cu 
@@ -17,11 +20,18 @@ add_executable(${PROJECT_NAME}
     src/cuda_rt.cu
     src/utils/bvh.cu
     src/utils/cuda_rt_util.cu
-    src/utils/ascii_print.cpp
+    src/utils/ascii_print.cu
     src/utils/main_util.cu
     src/utils/matrix_util.cu
 )
 
+# Include directories
+target_include_directories(${PROJECT_NAME} PRIVATE 
+    ${EIGEN3_INCLUDE_DIR} 
+    ${CUDAToolkit_INCLUDE_DIRS}
+)
+
+# Compile options
 target_compile_options(${PROJECT_NAME} PRIVATE 
     $<$<COMPILE_LANGUAGE:CUDA>:
         --generate-line-info
@@ -39,11 +49,15 @@ target_compile_options(${PROJECT_NAME} PRIVATE
     >
 )
 
+# Set CUDA properties
 set_target_properties(${PROJECT_NAME} PROPERTIES 
     CUDA_ARCHITECTURES "50;86"
     CUDA_RESOLVE_DEVICE_SYMBOLS ON
     CUDA_SEPARABLE_COMPILATION ON
 )
 
-target_link_libraries(${PROJECT_NAME} Eigen3::Eigen)
-target_link_libraries(${PROJECT_NAME} ${CUDA_LIBRARIES} cuda)
+# Link libraries
+target_link_libraries(${PROJECT_NAME} PRIVATE 
+    Eigen3::Eigen 
+    ${CUDAToolkit_LIBRARIES}
+)

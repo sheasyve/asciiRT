@@ -1,5 +1,5 @@
-#ifndef UTIL_HPP
-#define UTIL_HPP
+#ifndef UTIL_CUH
+#define UTIL_CUH
 
 #include <iostream>
 #include <vector>
@@ -23,9 +23,11 @@
 #include <fstream>
 #include <optional>
 #include <memory>
-#include <Eigen/Dense>
 #include <variant>
-#include <chrono>
+#include <thread> 
+#include "v3f.cuh"
+#include "v3f.cuh"
+#include "m4f.cuh"
 
 #define _USE_MATH_DEFINES
 #define ll long long
@@ -38,21 +40,4 @@ const float EPS = 0.00001;
 const float INF = 1e18;
 const float NINF = -1e18;
 
-using namespace Eigen;//Eigen library for linear algebra, matrix handling
-
-template <typename T>
-std::vector<T> vector_in(int n) {
-    std::vector<T> v(n);
-    for (int i = 0; i < n; i++) {
-        std::cin >> v[i];
-    }
-    return v;
-}
-
-template <typename T>
-void vector_out(const std::vector<T> &v) {
-    std::copy(v.begin(), v.end(), std::ostream_iterator<T>(std::cout, " "));
-    std::cout << '\n';
-}
-
-#endif  // UTIL_HPP
+#endif  // UTIL_CUH

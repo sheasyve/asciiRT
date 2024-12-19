@@ -3,6 +3,8 @@
 
 #include "utils/cuda_rt_util.cuh"
 
-float* h_raytrace(std::vector<Eigen::Vector3f> ray_origins, std::vector<Eigen::Vector3f> ray_directions, std::vector<Mesh> meshes, int width, int height, std::vector<Eigen::Vector3f> light_positions, std::vector<Eigen::Vector4f> light_colors);
+float* h_raytrace(std::vector<Mesh> meshes, int width, int height, 
+    std::vector<V3f> light_positions, std::vector<V4f> light_colors, 
+    float focal_length, float field_of_view, V3f camera_position);
 
 #endif

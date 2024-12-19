@@ -1,7 +1,7 @@
 #ifndef MATRIX_CUH
 #define MATRIX_CUH
 
-#include "util.hpp"
+#include "util.cuh"
 #include "../shapes/mesh.cuh"
 #include "../shapes/triangle.cuh"
 
